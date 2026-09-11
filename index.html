@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OTAKU ARENA</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+:root{--ink:#050719;--panel:rgba(13,20,51,.84);--cyan:#25e6ff;--magenta:#ff3ab7;--violet:#8067ff;--gold:#ffd166;--muted:#a9b7d7}
+*{box-sizing:border-box}
+body{margin:0;color:#f4f8ff;font-family:Inter,system-ui,sans-serif;background:var(--ink);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(37,230,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(37,230,255,.025) 1px,transparent 1px);background-size:38px 38px;z-index:0}
+.app{position:relative;z-index:1;min-height:100vh}
+.glass{background:var(--panel);border:1px solid rgba(91,221,255,.22);box-shadow:0 18px 45px rgba(0,0,0,.25);backdrop-filter:blur(15px)}
+.brand{font-family:monospace;letter-spacing:.1em;text-shadow:0 0 22px rgba(37,230,255,.55)}
+.view{display:none;animation:rise .25s ease}.view.active{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.meter{height:9px;border-radius:999px;background:#182144;overflow:hidden}
+.meter span{display:block;height:100%;transition:width .35s}
+.answer{transition:.15s;cursor:pointer}
+.answer:not(:disabled):hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 18px rgba(37,230,255,.15)}
+.answer:disabled{cursor:default;opacity:.92}
+.correct{border-color:#61ffad!important;background:rgba(34,197,94,.22)!important}
+.wrong{border-color:#ff627e!important;background:rgba(244,63,94,.22)!important}
+.avatar{width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,#25e6ff,#8067ff);display:grid;place-items:center;font-size:30px;font-weight:900}
+.rank-row{display:grid;grid-template-columns:45px 1fr 90px;gap:10px;align-items:center}
+.text-gold-300{color:var(--gold)}
+.border-gold-300\/30{border-color:rgba(255,209,102,.3)}
+.bg-magenta-500\/20{background:rgba(255,58,183,.18)}
+.border-magenta-400\/40{border-color:rgba(255,58,183,.4)}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,3px)}}
+.shake{animation:shake .3s ease}
+@keyframes floatUp{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-70px);opacity:0}}
+.float-dmg{position:absolute;font-weight:900;font-size:26px;pointer-events:none;animation:floatUp .85s ease-out forwards;text-shadow:0 0 12px currentColor}
+@keyframes cardIn{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.card-in{animation:cardIn .35s ease backwards}
+.pulse-danger{animation:pulseRed 1s infinite}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(255,58,183,.5)}50%{box-shadow:0 0 0 18px rgba(255,58,183,0)}}
+.mobilenav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:40;gap:2px;padding:6px;overflow-x:auto;border-radius:0}
+.mobilenav button{flex:1 0 auto;min-width:60px;border:0;background:transparent;color:var(--muted);border-radius:10px;padding:6px 4px;font-size:10px;font-weight:800;line-height:1.3;cursor:pointer}
+.mobilenav button.active{color:var(--cyan);background:rgba(37,230,255,.12)}
+.auth-input{width:100%;padding:.75rem 1rem;border-radius:.6rem;background:#0b1230;border:1px solid rgba(37,230,255,.25);color:#fff;margin-bottom:.6rem;outline:none;font-size:14px}
+.auth-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,230,255,.15)}
+.btn-primary{width:100%;padding:.85rem;border-radius:.6rem;font-weight:900;cursor:pointer;border:0;background:linear-gradient(90deg,#25e6ff,#8067ff);color:#050719}
+.btn-secondary{width:100%;padding:.6rem;border-radius:.6rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.06);color:#f4f8ff;border:1px solid rgba(37,230,255,.25);font-size:12px}
+@media(max-width:700px){
+  .desktop{display:none}
+  .avatar{width:58px;height:58px}
+  .rank-row{grid-template-columns:35px 1fr 70px}
+  .mobilenav{display:flex}
+  main{padding-bottom:8rem!important}
+}
+</style>
+</head>
+<body>
+
+<section id="authScreen" style="position:relative;z-index:100;min-height:100vh;display:grid;place-items:center;padding:0 1rem">
+  <div class="glass rounded-3xl p-8 w-full max-w-md">
+    <p class="brand text-3xl text-cyan-300 font-black text-center">OTAKU ARENA</p>
+    <p class="text-center text-xs text-slate-400 mt-2 mb-6">Connecte-toi pour rejoindre l'arène</p>
+    <div class="flex gap-2 mb-5">
+      <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg text-sm font-bold">CONNEXION</button>
+      <button id="tabSignup" onclick="switchAuthTab('signup')" class="flex-1 py-2 rounded-lg text-sm font-bold">INSCRIPTION</button>
+    </div>
+    <input id="authPseudo" type="text" placeholder="Pseudo (visible dans le classement)" maxlength="20" class="auth-input" style="display:none">
+    <input id="authEmail" type="email" placeholder="Email" autocomplete="email" class="auth-input">
+    <input id="authPassword" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password" class="auth-input">
+    <p id="authMsg" style="color:#ff627e;font-size:12px;min-height:16px;margin-top:.3rem"></p>
+    <button id="authSubmit" onclick="submitAuth()" class="btn-primary mt-3">SE CONNECTER</button>
+    <button onclick="resetPasswordFlow()" class="btn-secondary mt-3">Mot de passe oublié ?</button>
+  </div>
+</section>
+
+<div class="app" id="appWrap" style="display:none">
+<header class="glass sticky top-0 z-30 border-x-0 border-t-0">
+<div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
+<button onclick="showView('home')" class="brand text-cyan-300 font-black">OTAKU ARENA</button>
+<nav class="desktop flex gap-1 text-xs font-bold">
+<button data-nav="home" onclick="showView('home')" class="px-3 py-2">ACCUEIL</button>
+<button data-nav="duel" onclick="startDuel()" class="px-3 py-2">DUEL</button>
+<button data-nav="rogue" onclick="startRogue()" class="px-3 py-2 text-gold-300">🔥 ARÈNE</button>
+<button data-nav="royale" onclick="startRoyale()" class="px-3 py-2">ROYALE</button>
+<button data-nav="boss" onclick="startBoss()" class="px-3 py-2">BOSS</button>
+<button data-nav="profile" onclick="showView('profile')" class="px-3 py-2">PROFIL</button>
+<button data-nav="ranking" onclick="showView('ranking')" class="px-3 py-2">CLASSEMENT</button>
+</nav>
+<div class="flex gap-2">
+<button id="sound" onclick="toggleSound()" class="rounded-lg border border-cyan-300/30 px-3 py-2 text-xs">SON : ON</button>
+<button onclick="logout()" class="rounded-lg border border-pink-400/40 px-3 py-2 text-xs text-pink-300 font-bold">DÉCO</button>
+</div>
+</div></header>
+
+<main class="max-w-7xl mx-auto px-4 py-7 pb-24">
+
+<section id="home" class="view active">
+<div class="grid lg:grid-cols-12 gap-5">
+<div class="glass rounded-3xl p-8 lg:col-span-8">
+<p class="text-xs font-bold tracking-widest text-cyan-300">SAISON 01 · CONNAISSANCE ANIME</p>
+<h1 class="brand text-4xl md:text-5xl font-black mt-3">LA GUERRE DES CONNAISSEURS</h1>
+<p class="text-lg text-slate-300 mt-4 max-w-2xl">Affronte des otaku, reconnais les personnages, les techniques, les arcs et les openings, puis grimpe jusqu'au rang OTAKU GOD.</p>
+<p class="text-xs text-gold-300 mt-3">📚 <b id="questionCount">0</b> questions chargées</p>
+<div class="flex flex-wrap gap-3 mt-7">
+<button onclick="startDuel()" class="bg-cyan-300 text-slate-950 font-black rounded-xl px-6 py-4">⚔ LANCER UN DUEL</button>
+<button onclick="startRogue()" class="bg-gradient-to-r from-yellow-300 to-pink-400 text-slate-950 font-black rounded-xl px-6 py-4">🔥 ARÈNE ROGUELITE</button>
+<button onclick="startRoyale()" class="bg-magenta-500/20 border border-magenta-400/40 rounded-xl px-5 py-4 font-bold">👑 OTAKU ROYALE</button>
+<button onclick="startBoss()" class="bg-violet-500/20 border border-violet-400/40 rounded-xl px-5 py-4 font-bold">👹 BOSS</button>
+</div>
+</div>
+<aside class="glass rounded-3xl p-6 lg:col-span-4">
+<p class="text-xs font-bold text-pink-300 tracking-widest">COMBATTANT</p>
+<div class="flex items-center gap-4 mt-3"><div class="avatar" id="homeAvatar">O</div><div><h2 id="homeTitle" class="text-xl font-black">Débutant</h2><p id="homeLevel" class="text-cyan-300">NIVEAU 1</p><p id="homePseudo" class="text-xs text-slate-400"></p></div></div>
+<div class="mt-6 flex justify-between text-xs"><span>XP</span><span id="homeXp">0 XP</span></div>
+<div class="meter mt-2"><span id="homeXpBar" style="width:0%;background:linear-gradient(90deg,#25e6ff,#8067ff)"></span></div>
+<div class="grid grid-cols-2 gap-3 mt-5"><div class="bg-white/5 rounded-xl p-3"><small>COTE</small><strong id="homeRating" class="block text-cyan-300 text-xl">1200</strong></div><div class="bg-white/5 rounded-xl p-3"><small>SÉRIE</small><strong id="homeStreak" class="block text-gold-300 text-xl">0</strong></div></div>
+</aside></div>
+</section>
+
+<section id="duel" class="view">
+<div class="flex justify-between items-center mb-5"><div><p class="text-xs text-cyan-300 font-bold tracking-widest">ARÈNE CLASSÉE</p><h1 class="text-3xl font-black">DUEL OTAKU</h1></div><div class="glass rounded-xl px-5 py-3 text-center"><small>TEMPS</small><strong id="timer" class="block text-2xl text-gold-300">15.0</strong></div></div>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="glass rounded-2xl p-5"><div class="flex gap-4 items-center"><div class="avatar">O</div><div class="flex-1"><p class="text-xs text-cyan-300">TOI · <span id="combo">COMBO x0</span></p><h2 class="font-black">JOUEUR</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="phpText">100/100</span></div><div class="meter mt-2"><span id="php" style="width:100%;background:linear-gradient(90deg,#25e6ff,#57ffca)"></span></div></div></div></div>
+<div class="glass rounded-2xl p-5"><div class="flex gap-4 items-center"><div class="avatar" style="background:linear-gradient(135deg,#ff3ab7,#52265f)">K</div><div class="flex-1"><p class="text-xs text-pink-300">ADVERSAIRE</p><h2 id="enemyName" class="font-black">KuroNeko</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="ehpText">100/100</span></div><div class="meter mt-2"><span id="ehp" style="width:100%;background:linear-gradient(90deg,#ff3ab7,#ff8a65)"></span></div></div></div></div>
+</div>
+<div class="grid lg:grid-cols-12 gap-5 mt-5">
+<section class="glass rounded-2xl p-5 lg:col-span-8">
+<div class="flex justify-between"><span id="qMeta" class="text-xs font-bold text-violet-300"></span><span id="qDiff" class="text-xs font-bold text-gold-300"></span></div>
+<div id="qMedia" class="rounded-xl mt-4 min-h-28 grid place-items-center bg-gradient-to-br from-indigo-950 to-fuchsia-950 border border-cyan-300/20 text-center p-6">
+<div><div id="qEmoji" class="text-6xl">❓</div><p id="qMediaText" class="text-xs text-slate-400 mt-2">Représentation symbolique</p></div></div>
+<p id="qCat" class="text-cyan-300 text-sm font-bold mt-4"></p><h2 id="qText" class="text-xl md:text-2xl font-black mt-2"></h2>
+<p id="hint" class="hidden mt-3 rounded-lg border-l-2 border-cyan-300 bg-cyan-300/10 p-3 text-sm"></p>
+<div id="answers" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
+<p id="feedback" class="min-h-6 text-center font-bold text-gold-300 mt-4"></p>
+</section>
+<aside class="space-y-4">
+<section class="glass rounded-2xl p-5"><h2 class="font-bold">POUVOIRS</h2>
+<div class="space-y-2 mt-3">
+<button id="scan" onclick="usePower('scan')" class="w-full text-left rounded-xl border border-cyan-300/30 p-3"><b>🔍 SCAN</b><span class="block text-xs text-slate-400">Indice · <i id="scanN">1 restant</i></span></button>
+<button id="risk" onclick="usePower('risk')" class="w-full text-left rounded-xl border border-pink-300/30 p-3"><b>💣 RISQUE MAX</b><span class="block text-xs text-slate-400">Dégâts x2 · <i id="riskN">1 restant</i></span></button>
+<button id="vision" onclick="usePower('vision')" class="w-full text-left rounded-xl border border-violet-300/30 p-3"><b>👁 VISION</b><span class="block text-xs text-slate-400">Révèle le média · <i id="visionN">1 restant</i></span></button>
+</div></section>
+</aside></div>
+<div id="duelResult" class="hidden glass rounded-3xl p-8 mt-5 text-center"><p id="resultKicker" class="text-xs text-cyan-300 font-bold"></p><h2 id="resultTitle" class="text-4xl font-black mt-2"></h2><p id="resultCopy" class="text-slate-300 mt-3"></p><button onclick="startDuel()" class="mt-6 bg-cyan-300 text-slate-950 rounded-xl px-6 py-3 font-black">REJOUER</button></div>
+</section>
+
+<section id="rogue" class="view">
+<div id="rogueIntro" class="glass rounded-3xl p-7">
+<p class="text-xs text-gold-300 font-bold tracking-widest">MODE ROGUELITE · 10 COMBATS</p>
+<h1 class="brand text-4xl md:text-5xl font-black mt-2">🔥 ARÈNE ROGUELITE</h1>
+<p class="text-slate-300 mt-3 max-w-2xl">Enchaîne 10 adversaires sans mourir.</p>
+<div class="grid md:grid-cols-3 gap-4 mt-7">
+<div class="bg-white/5 rounded-2xl p-5"><small>COMBATS</small><strong class="block text-4xl text-cyan-300">10</strong></div>
+<div class="bg-white/5 rounded-2xl p-5"><small>VIES</small><strong class="block text-4xl text-gold-300">3</strong></div>
+<div class="bg-white/5 rounded-2xl p-5"><small>MEILLEURE RUN</small><strong id="rogueBest" class="block text-4xl text-pink-300">0</strong></div>
+</div>
+<button onclick="rogueBegin()" class="mt-7 bg-gradient-to-r from-yellow-300 to-pink-400 text-slate-950 font-black rounded-xl px-7 py-4">COMMENCER LA RUN</button>
+</div>
+<div id="rogueFight" class="hidden">
+<div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+<div><p class="text-xs text-gold-300 font-bold tracking-widest">COMBAT <span id="rogueRound">1</span>/10</p><h1 class="text-3xl font-black">🔥 ARÈNE ROGUELITE</h1></div>
+<div class="flex gap-2 flex-wrap">
+<div class="glass rounded-xl px-4 py-2 text-center"><small>VIES</small><strong id="rogueLives" class="block text-xl text-gold-300">♥♥♥</strong></div>
+<div class="glass rounded-xl px-4 py-2 text-center"><small>TEMPS</small><strong id="rogueTimer" class="block text-2xl text-gold-300">12.0</strong></div>
+</div></div>
+<div class="grid md:grid-cols-2 gap-4">
+<div id="roguePlayerCard" class="glass rounded-2xl p-5 relative overflow-hidden">
+<div class="flex gap-4 items-center"><div class="avatar">O</div><div class="flex-1"><p class="text-xs text-cyan-300">TOI · <span id="rogueCombo">COMBO x0</span></p><h2 class="font-black">JOUEUR</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="roguePhpText">100/100</span></div><div class="meter mt-2"><span id="roguePhp" style="width:100%;background:linear-gradient(90deg,#25e6ff,#57ffca)"></span></div></div></div>
+<div id="roguePlayerFx" class="absolute inset-0 pointer-events-none"></div>
+</div>
+<div id="rogueEnemyCard" class="glass rounded-2xl p-5 relative overflow-hidden">
+<div class="flex gap-4 items-center"><div class="avatar" style="background:linear-gradient(135deg,#ff3ab7,#52265f)" id="rogueEnemyIcon">👹</div><div class="flex-1"><p class="text-xs text-pink-300">ADVERSAIRE · <span id="rogueEnemyDiff">GENIN</span></p><h2 id="rogueEnemyName" class="font-black">KuroNeko</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="rogueEhpText">100/100</span></div><div class="meter mt-2"><span id="rogueEhp" style="width:100%;background:linear-gradient(90deg,#ff3ab7,#ff8a65)"></span></div></div></div>
+<div id="rogueEnemyFx" class="absolute inset-0 pointer-events-none"></div>
+</div></div>
+<div class="grid lg:grid-cols-12 gap-5 mt-5">
+<section class="glass rounded-2xl p-5 lg:col-span-8">
+<div class="flex justify-between"><span id="rogueMeta" class="text-xs font-bold text-violet-300"></span><span id="rogueCat" class="text-xs font-bold text-gold-300"></span></div>
+<div class="rounded-xl mt-4 min-h-24 grid place-items-center bg-gradient-to-br from-indigo-950 to-fuchsia-950 border border-cyan-300/20 text-center p-5"><div id="rogueEmoji" class="text-5xl">❓</div></div>
+<h2 id="rogueQ" class="text-xl md:text-2xl font-black mt-4"></h2>
+<div id="rogueAnswers" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
+<p id="rogueFeedback" class="min-h-6 text-center font-bold text-gold-300 mt-4"></p>
+</section>
+<aside class="space-y-4">
+<section class="glass rounded-2xl p-5"><h2 class="font-bold text-gold-300">TON BUILD</h2><div id="rogueBuild" class="mt-3 space-y-2 text-xs"><p class="text-slate-400">Aucune carte.</p></div></section>
+</aside></div>
+</div>
+<div id="rogueCardScreen" class="hidden"><div class="glass rounded-3xl p-7 text-center"><p class="text-xs text-gold-300 font-bold tracking-widest">COMBAT REMPORTÉ</p><h2 class="text-4xl font-black mt-2">CHOISIS UNE CARTE</h2><div id="rogueCards" class="grid md:grid-cols-3 gap-4 mt-7"></div></div></div>
+<div id="rogueEnd" class="hidden"><div class="glass rounded-3xl p-8 text-center"><p id="rogueEndKicker" class="text-xs text-cyan-300 font-bold tracking-widest"></p><h2 id="rogueEndTitle" class="text-4xl font-black mt-2"></h2><p id="rogueEndCopy" class="text-slate-300 mt-3"></p><div class="flex gap-3 justify-center mt-7 flex-wrap"><button onclick="rogueBegin()" class="bg-gradient-to-r from-yellow-300 to-pink-400 text-slate-950 font-black rounded-xl px-6 py-3">REJOUER</button><button onclick="showView('home')" class="bg-white/5 border border-cyan-300/20 rounded-xl px-6 py-3 font-bold">ACCUEIL</button></div></div></div>
+</section>
+
+<section id="royale" class="view">
+<div class="glass rounded-3xl p-7">
+<p class="text-xs text-gold-300 font-bold tracking-widest">100 → 1</p><h1 class="text-4xl font-black mt-2">👑 OTAKU ROYALE</h1>
+<p class="text-slate-300 mt-2">7 manches, 3 vies.</p>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-7">
+<div class="bg-white/5 rounded-2xl p-5"><small>JOUEURS</small><strong id="royalePlayers" class="block text-4xl">100</strong></div>
+<div class="bg-white/5 rounded-2xl p-5"><small>ÉLIMINÉS</small><strong id="royaleElim" class="block text-4xl text-pink-300">0</strong></div>
+<div class="bg-white/5 rounded-2xl p-5"><small>TA POSITION</small><strong id="royalePos" class="block text-4xl text-cyan-300">100</strong></div>
+<div class="bg-white/5 rounded-2xl p-5"><small>VIES</small><strong id="royaleHp" class="block text-4xl text-gold-300">♥♥♥</strong></div>
+</div>
+<div class="meter mt-7"><span id="royaleBar" style="width:0%;background:linear-gradient(90deg,#25e6ff,#ff3ab7)"></span></div>
+<p id="royaleStatus" class="text-center text-xl font-black mt-5">Prêt.</p>
+<div id="royaleQWrap" class="hidden bg-black/20 rounded-2xl p-5 mt-6"><p id="royaleCat" class="text-violet-300 text-xs font-bold"></p><h2 id="royaleQ" class="text-xl font-black mt-2"></h2><div id="royaleA" class="grid md:grid-cols-2 gap-3 mt-5"></div></div>
+<p id="royaleFeed" class="text-center min-h-6 mt-4 font-bold text-gold-300"></p>
+<button id="royaleBtn" onclick="royaleStep()" class="block mx-auto mt-6 bg-pink-500/20 border border-pink-300/40 rounded-xl px-7 py-4 font-black">COMMENCER LA MANCHE</button>
+</div></section>
+
+<section id="boss" class="view">
+<div class="glass rounded-3xl p-7">
+<p class="text-xs text-pink-300 font-bold tracking-widest">20 QUESTIONS · EXTRÊME</p>
+<h1 class="text-4xl font-black mt-2">👹 BOSS OTAKU</h1>
+<p class="text-slate-300 mt-2">Bats l'épreuve avec au moins 15 bonnes réponses.</p>
+<div class="flex justify-between mt-6 text-xs"><span id="bossProgress"></span><span id="bossScore"></span></div>
+<div class="meter mt-2"><span id="bossBar" style="width:0%;background:linear-gradient(90deg,#ff3ab7,#ffd166)"></span></div>
+<div id="bossWrap" class="bg-black/20 rounded-2xl p-5 mt-6"><p id="bossCat" class="text-violet-300 text-xs font-bold"></p><h2 id="bossQ" class="text-xl font-black mt-2"></h2><div id="bossA" class="grid md:grid-cols-2 gap-3 mt-5"></div><p id="bossF" class="text-center min-h-6 mt-4 font-bold text-gold-300"></p></div>
+<div id="bossResult" class="hidden text-center mt-6"><h2 id="bossTitle" class="text-3xl font-black"></h2><p id="bossCopy" class="text-slate-300 mt-2"></p><button onclick="startBoss()" class="mt-5 bg-pink-500/20 border border-pink-300/40 rounded-xl px-6 py-3 font-bold">RELEVER LE BOSS</button></div>
+</div></section>
+
+<section id="profile" class="view"><div class="glass rounded-3xl p-7"><p class="text-xs text-cyan-300 font-bold tracking-widest">IDENTITÉ DE COMBAT</p><h1 class="text-4xl font-black mt-2">PROFIL</h1>
+<div class="grid lg:grid-cols-3 gap-5 mt-7">
+<div class="bg-white/5 rounded-2xl p-5"><h2 id="profileTitle" class="text-2xl font-black">Débutant</h2><p id="profileLevel" class="text-cyan-300">NIVEAU 1</p><div class="meter mt-5"><span id="profileBar" style="width:0%;background:linear-gradient(90deg,#25e6ff,#8067ff)"></span></div><p id="profileXp" class="text-sm text-slate-300 mt-2"></p></div>
+<div class="bg-white/5 rounded-2xl p-5"><h2 class="font-bold">PALMARÈS</h2><p class="mt-4">Victoires <b id="wins" class="float-right text-cyan-300">0</b></p><p class="mt-3">Défaites <b id="losses" class="float-right text-pink-300">0</b></p><p class="mt-3">Meilleure série <b id="best" class="float-right text-gold-300">0</b></p><p class="mt-3">Cote <b id="rating" class="float-right text-violet-300">1200</b></p></div>
+<div class="bg-white/5 rounded-2xl p-5"><h2 class="font-bold">BADGES</h2><div id="badges" class="flex flex-wrap gap-2 mt-4"></div></div>
+</div></div></section>
+
+<section id="ranking" class="view"><div class="glass rounded-3xl p-7"><p class="text-xs text-gold-300 font-bold tracking-widest">LIGUE NÉON · TEMPS RÉEL</p><h1 class="text-4xl font-black mt-2">CLASSEMENT GLOBAL</h1><p class="text-xs text-slate-400 mt-2">Mis à jour en direct entre tous les joueurs.</p><div id="rankingList" class="space-y-2 mt-6"><p class="text-slate-400">Chargement…</p></div></div></section>
+
+<footer class="text-center text-xs text-slate-500 mt-10">OTAKU ARENA · synchronisé via Firebase</footer>
+</main>
+
+<nav class="mobilenav glass">
+<button data-nav="home" onclick="showView('home')">🏠<span class="block">ACCUEIL</span></button>
+<button data-nav="duel" onclick="startDuel()">⚔<span class="block">DUEL</span></button>
+<button data-nav="rogue" onclick="startRogue()">🔥<span class="block">ARÈNE</span></button>
+<button data-nav="royale" onclick="startRoyale()">👑<span class="block">ROYALE</span></button>
+<button data-nav="boss" onclick="startBoss()">👹<span class="block">BOSS</span></button>
+<button data-nav="profile" onclick="showView('profile')">👤<span class="block">PROFIL</span></button>
+<button data-nav="ranking" onclick="showView('ranking')">🏅<span class="block">RANGS</span></button>
+</nav>
+
+<div id="toast" class="fixed bottom-24 md:bottom-5 left-1/2 -translate-x-1/2 glass rounded-xl px-5 py-3 hidden z-50 text-sm font-bold"></div>
+</div>
+
+<script src="questions.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyApTBYgCc51o4ZA6p3MSPfszf0s8ShnZYs",
+  authDomain: "otaku-arena-d7b24.firebaseapp.com",
+  projectId: "otaku-arena-d7b24",
+  storageBucket: "otaku-arena-d7b24.firebasestorage.app",
+  messagingSenderId: "944332998748",
+  appId: "1:944332998748:web:857ffdc09fcf8f3dbe3e99"
+};
+
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.firestore();
+
+if(typeof QUESTIONS==="undefined"||!Array.isArray(QUESTIONS)||!QUESTIONS.length){
+  window.QUESTIONS=[
+    {anime:"Démo",cat:"LORE",diff:"GENIN",q:"Où doit être placé questions.js ?",a:["Dans le même dossier","Ailleurs","Nulle part","En ZIP"],ok:0,h:"À côté du HTML.",emoji:"📁"},
+    {anime:"Démo",cat:"LORE",diff:"GENIN",q:"Aucune limite de questions ?",a:["Vrai","Faux","Peut-être","Non"],ok:0,h:"Autant que tu veux.",emoji:"📚"},
+    {anime:"Démo",cat:"LORE",diff:"GENIN",q:"Comment ajouter une question ?",a:["Copier une ligne","Réécrire le HTML","Appeler un dev","Attendre"],ok:0,h:"Simple.",emoji:"✏️"}
+  ];
+}
+
+var DEFAULT_STATE={xp:0,level:1,rating:1200,wins:0,losses:0,bestStreak:0,streak:0,answers:0,correct:0,bestCombo:0,domains:{},animeSeen:{},badges:[],sound:true,royaleWins:0,rogueBest:0,rogueRuns:0,pseudo:"Joueur"};
+var state = Object.assign({}, DEFAULT_STATE);
+var currentUser = null;
+var unsubscribeLeaderboard = null;
+
+var titles=["Débutant","Apprenti Otaku","Otaku Confirmé","Expert Anime","Maître Otaku","Otaku Élite","Légende","Grand Maître Otaku","Otaku God"];
+var enemyNames=["KuroNeko","MikaByte","SoraFlux","RinKaze","AkumaSensei","NekoRonin"];
+
+function level(){return Math.floor(state.xp/120)+1}
+function title(){return titles[Math.min(titles.length-1,Math.floor(state.xp/180))]}
+function xpPct(){return (state.xp%120)/120*100}
+function accuracy(){return state.answers?Math.round(state.correct/state.answers*100):0}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function $(id){return document.getElementById(id)}
+
+function save(){
+  if(!currentUser) return;
+  db.collection("profiles").doc(currentUser.uid).set({
+    pseudo: state.pseudo||"Joueur", xp: state.xp, rating: state.rating,
+    wins: state.wins, losses: state.losses, bestStreak: state.bestStreak, streak: state.streak,
+    answers: state.answers, correct: state.correct, bestCombo: state.bestCombo,
+    rogueBest: state.rogueBest, rogueRuns: state.rogueRuns,
+    domains: state.domains, animeSeen: state.animeSeen, badges: state.badges,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, {merge:true}).catch(function(e){console.warn(e)});
+
+  db.collection("leaderboard").doc(currentUser.uid).set({
+    pseudo: state.pseudo||"Joueur", rating: state.rating, xp: state.xp, wins: state.wins,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, {merge:true}).catch(function(e){console.warn(e)});
+}
+
+var audioCtx=null;
+function ac(){if(audioCtx)return audioCtx;try{audioCtx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){audioCtx=null}return audioCtx}
+function beep(f,d,t,v,dl){if(!state.sound)return;var c=ac();if(!c)return;if(c.state==="suspended"){try{c.resume()}catch(e){}}var s=c.currentTime+(dl||0),o=c.createOscillator(),g=c.createGain();o.type=t||"sine";o.frequency.setValueAtTime(f,s);g.gain.setValueAtTime(.0001,s);g.gain.linearRampToValueAtTime(v||.05,s+.012);g.gain.exponentialRampToValueAtTime(.0001,s+(d||.08));o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+(d||.08)+.03)}
+function sfxGood(){beep(660,.09,"sine",.06);beep(990,.13,"sine",.05,.08)}
+function sfxBad(){beep(220,.16,"sawtooth",.05);beep(150,.20,"sawtooth",.045,.1)}
+function sfxWin(){[523,659,784,1046].forEach(function(f,i){beep(f,.16,"triangle",.055,i*.11)})}
+function sfxLose(){[440,330,247,196].forEach(function(f,i){beep(f,.20,"sine",.05,i*.13)})}
+function sfxCard(){beep(700,.05,"triangle",.04);beep(1050,.08,"triangle",.04,.05)}
+function sfxTick(){beep(1046,.03,"square",.02)}
+function sfxClick(){beep(520,.05,"triangle",.035)}
+function toggleSound(){state.sound=!state.sound;$("sound").textContent=state.sound?"SON : ON":"SON : OFF";save();if(state.sound){ac();sfxClick()}}
+
+var authMode = "login";
+function switchAuthTab(mode){
+  authMode = mode;
+  $("tabLogin").style.background = mode==="login" ? "rgba(37,230,255,.15)" : "transparent";
+  $("tabSignup").style.background = mode==="signup" ? "rgba(37,230,255,.15)" : "transparent";
+  $("authPseudo").style.display = mode==="signup" ? "block" : "none";
+  $("authSubmit").textContent = mode==="login" ? "SE CONNECTER" : "CRÉER MON COMPTE";
+  $("authMsg").textContent="";$("authMsg").style.color="#ff627e";
+}
+function setAuthMsg(msg, ok){
+  var el = $("authMsg");el.textContent = msg;el.style.color = ok ? "#61ffad" : "#ff627e";
+}
+function showApp(user){
+  currentUser = user;
+  $("authScreen").style.display = "none";
+  $("appWrap").style.display = "block";
+  loadProfile(user).then(function(){
+    renderHome();watchLeaderboard();
+  }).catch(function(e){
+    console.warn("Profil non chargé", e);
+    state = Object.assign({}, DEFAULT_STATE);
+    state.pseudo = user.displayName || "Joueur";
+    renderHome();watchLeaderboard();
+  });
+}
+function submitAuth(){
+  var email = $("authEmail").value.trim();
+  var password = $("authPassword").value;
+  var pseudo = $("authPseudo").value.trim();
+  if(!email || !password) return setAuthMsg("Email et mot de passe requis.");
+  if(password.length < 6) return setAuthMsg("Mot de passe : 6 caractères minimum.");
+  if(authMode==="signup" && pseudo.length < 3) return setAuthMsg("Pseudo : 3 caractères minimum.");
+  setAuthMsg("Connexion…", true);
+
+  if(authMode==="signup"){
+    auth.createUserWithEmailAndPassword(email, password).then(function(cred){
+      return cred.user.updateProfile({displayName: pseudo}).then(function(){
+        return db.collection("profiles").doc(cred.user.uid).set({
+          pseudo: pseudo, email: email,
+          xp:0, rating:1200, wins:0, losses:0, bestStreak:0, streak:0,
+          answers:0, correct:0, bestCombo:0, rogueBest:0, rogueRuns:0,
+          domains:{}, animeSeen:{}, badges:[],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).then(function(){
+        return db.collection("leaderboard").doc(cred.user.uid).set({
+          pseudo: pseudo, rating:1200, xp:0, wins:0,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).then(function(){
+        showApp(cred.user);
+      });
+    }).catch(function(err){
+      var map = {
+        "auth/email-already-in-use":"Cet email est déjà utilisé.",
+        "auth/invalid-email":"Email invalide.",
+        "auth/weak-password":"Mot de passe trop faible.",
+        "auth/network-request-failed":"Problème de connexion."
+      };
+      setAuthMsg(map[err.code] || ("Erreur : " + err.code));
+    });
+  }else{
+    auth.signInWithEmailAndPassword(email, password).then(function(cred){
+      showApp(cred.user);
+    }).catch(function(err){
+      var map = {
+        "auth/user-not-found":"Aucun compte avec cet email.",
+        "auth/wrong-password":"Mot de passe incorrect.",
+        "auth/invalid-credential":"Email ou mot de passe incorrect.",
+        "auth/invalid-email":"Email invalide.",
+        "auth/network-request-failed":"Problème de connexion."
+      };
+      setAuthMsg(map[err.code] || ("Erreur : " + err.code));
+    });
+  }
+}
+function resetPasswordFlow(){
+  var email = $("authEmail").value.trim();
+  if(!email) return setAuthMsg("Entre ton email d'abord.");
+  auth.sendPasswordResetEmail(email).then(function(){
+    setAuthMsg("Email de réinitialisation envoyé.", true);
+  }).catch(function(){ setAuthMsg("Impossible d'envoyer l'email."); });
+}
+function logout(){
+  if(confirm("Se déconnecter ?")) auth.signOut();
+}
+
+function loadProfile(user){
+  return db.collection("profiles").doc(user.uid).get().then(function(snap){
+    if(snap.exists){
+      var data = snap.data();
+      state = Object.assign({}, DEFAULT_STATE, data);
+      state.domains = data.domains || {};
+      state.animeSeen = data.animeSeen || {};
+      state.badges = data.badges || [];
+      state.pseudo = data.pseudo || user.displayName || "Joueur";
+    }else{
+      state = Object.assign({}, DEFAULT_STATE);
+      state.pseudo = user.displayName || "Joueur";
+    }
+  });
+}
+
+function watchLeaderboard(){
+  if(unsubscribeLeaderboard) unsubscribeLeaderboard();
+  unsubscribeLeaderboard = db.collection("leaderboard").orderBy("rating","desc").limit(100)
+    .onSnapshot(function(snap){
+      var list = [];
+      snap.forEach(function(d){ list.push(Object.assign({uid:d.id}, d.data())); });
+      renderRanking(list);
+    }, function(err){ console.warn("Leaderboard", err); });
+}
+
+function prepareQuestion(q){
+  var pairs=[];
+  for(var i=0;i<q.a.length;i++)pairs.push({txt:q.a[i],ok:i===q.ok});
+  for(var j=pairs.length-1;j>0;j--){var r=Math.floor(Math.random()*(j+1));var t=pairs[j];pairs[j]=pairs[r];pairs[r]=t}
+  var a=[],ok=0;
+  for(var n=0;n<pairs.length;n++){a.push(pairs[n].txt);if(pairs[n].ok)ok=n}
+  return {anime:q.anime,cat:q.cat,diff:q.diff,q:q.q,a:a,ok:ok,h:q.h,emoji:q.emoji};
+}
+function addXp(n){var b=level();state.xp+=n;var a=level();if(a>b){toast("🎉 NIVEAU "+a+" · "+title());sfxWin()}}
+var duelTimer=null,royaleTimer=null,rogueTimer=null;
+function showView(id){
+  clearInterval(duelTimer);clearInterval(royaleTimer);clearInterval(rogueTimer);
+  var v=document.querySelectorAll(".view");
+  for(var i=0;i<v.length;i++)v[i].classList.toggle("active",v[i].id===id);
+  var nv=document.querySelectorAll("[data-nav]");
+  for(var j=0;j<nv.length;j++)nv[j].classList.toggle("active",nv[j].getAttribute("data-nav")===id);
+  if(id==="profile")renderProfile();
+  if(id==="home")renderHome();
+  if(id==="rogue")$("rogueBest").textContent=state.rogueBest;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.remove("hidden");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.add("hidden")},2200)}
+function renderHome(){
+  $("homeTitle").textContent=title();
+  $("homeLevel").textContent="NIVEAU "+level();
+  $("homeXp").textContent=state.xp+" XP";
+  $("homeXpBar").style.width=xpPct()+"%";
+  $("homeRating").textContent=state.rating;
+  $("homeStreak").textContent=state.streak;
+  $("homePseudo").textContent="@"+(state.pseudo||"joueur");
+  $("homeAvatar").textContent=(state.pseudo||"J")[0].toUpperCase();
+  $("questionCount").textContent=QUESTIONS.length;
+  $("sound").textContent=state.sound?"SON : ON":"SON : OFF";
+}
+
+var duel={qs:[],i:0,php:100,ehp:100,combo:0,answered:true,elapsed:0,lastTick:99,powers:{scan:1,risk:1,vision:1},scan:false,risk:false};
+function startDuel(){
+  showView("duel");
+  var pool=QUESTIONS.slice();pool.sort(function(){return Math.random()-.5});
+  var prep=[];for(var i=0;i<Math.min(5,pool.length);i++)prep.push(prepareQuestion(pool[i]));
+  duel={qs:prep,i:0,php:100,ehp:100,combo:0,answered:true,elapsed:0,lastTick:99,powers:{scan:1,risk:1,vision:1},scan:false,risk:false};
+  $("duelResult").classList.add("hidden");
+  $("enemyName").textContent=pick(enemyNames);
+  renderDuel();
+}
+function renderDuel(){
+  clearInterval(duelTimer);
+  duel.answered=false;duel.elapsed=0;duel.lastTick=99;duel.scan=false;duel.risk=false;
+  var q=duel.qs[duel.i];
+  $("qMeta").textContent="MANCHE "+(duel.i+1)+"/"+duel.qs.length+" · "+q.anime;
+  $("qDiff").textContent=q.diff;$("qCat").textContent=q.cat;$("qText").textContent=q.q;$("qEmoji").textContent=q.emoji;
+  $("hint").classList.add("hidden");$("hint").textContent=q.h;
+  $("feedback").textContent="";$("timer").textContent="15.0";
+  var h=$("answers");h.innerHTML="";
+  q.a.forEach(function(x,i){var b=document.createElement("button");b.className="answer bg-white/5 border border-cyan-300/20 rounded-xl p-4 text-left font-bold";b.textContent=(i+1)+". "+x;b.onclick=function(){answerDuel(i)};h.appendChild(b)});
+  updateDuel();renderPowers();
+  duelTimer=setInterval(function(){duel.elapsed+=.1;var left=Math.max(0,15-duel.elapsed);$("timer").textContent=left.toFixed(1);var s=Math.ceil(left);if(s<=5&&s>0&&s!==duel.lastTick){duel.lastTick=s;sfxTick()}if(duel.elapsed>=15)answerDuel(-1)},100);
+}
+function renderPowers(){
+  var keys=["scan","risk","vision"];
+  for(var i=0;i<keys.length;i++){var p=keys[i];$(p+"N").textContent=duel.powers[p]+" restant";$(p).disabled=!duel.powers[p]||duel.answered}
+}
+function usePower(p){
+  if(duel.answered||!duel.powers[p])return;
+  duel.powers[p]--;
+  beep(880,.07,"square",.035);beep(1320,.09,"square",.03,.07);
+  if(p==="scan"){duel.scan=true;$("hint").classList.remove("hidden");toast("🔍 Indice")}
+  if(p==="risk"){duel.risk=true;toast("💣 Risque max")}
+  if(p==="vision"){duel.vision=true;var q=duel.qs[duel.i];$("qMedia").classList.add("ring-2","ring-violet-400");$("qMediaText").textContent=q.emoji+" "+q.anime+" · "+q.cat;toast("👁 Vision")}
+  renderPowers();
+}
+function damage(){var e=duel.elapsed,d;if(e<=2)d=30;else if(e<=4)d=25;else if(e<=7)d=20;else if(e<=10)d=15;else d=10;if(duel.scan)d=Math.max(5,d-5);return duel.risk?d*2:d}
+function answerDuel(choice){
+  if(duel.answered)return;
+  duel.answered=true;clearInterval(duelTimer);
+  var q=duel.qs[duel.i],good=choice===q.ok,d=damage();
+  var b=document.querySelectorAll("#answers button");
+  for(var i=0;i<b.length;i++){b[i].disabled=true;if(i===q.ok)b[i].classList.add("correct");if(i===choice&&!good)b[i].classList.add("wrong")}
+  state.answers++;
+  if(!state.domains[q.cat])state.domains[q.cat]={correct:0,total:0};
+  state.domains[q.cat].total++;
+  if(!state.animeSeen[q.anime])state.animeSeen[q.anime]=0;
+  var fb=$("feedback");
+  if(good){sfxGood();state.correct++;state.domains[q.cat].correct++;state.animeSeen[q.anime]++;duel.combo++;if(duel.combo>state.bestCombo)state.bestCombo=duel.combo;duel.ehp=Math.max(0,duel.ehp-d);addXp(10+d);fb.textContent="✓ −"+d+" PV · COMBO x"+duel.combo}
+  else{sfxBad();var p=duel.risk?30:15;duel.php=Math.max(0,duel.php-p);duel.combo=0;fb.textContent="✗ −"+p+" PV"}
+  updateDuel();renderPowers();save();
+  setTimeout(function(){
+    if(duel.php<=0||duel.ehp<=0)return finishDuel();
+    if(Math.random()<Math.min(.75,.42+(level()/100))){var ed=[8,12,16][Math.floor(Math.random()*3)];duel.php=Math.max(0,duel.php-ed);fb.textContent+=" · Riposte −"+ed;updateDuel()}
+    setTimeout(function(){if(duel.php<=0)return finishDuel();duel.i++;if(duel.i>=duel.qs.length)return finishDuel();renderDuel()},600);
+  },600);
+}
+function updateDuel(){$("php").style.width=duel.php+"%";$("ehp").style.width=duel.ehp+"%";$("phpText").textContent=duel.php+"/100";$("ehpText").textContent=duel.ehp+"/100";$("combo").textContent="COMBO x"+duel.combo}
+function finishDuel(){
+  clearInterval(duelTimer);
+  var draw=duel.php===duel.ehp,win=!draw&&(duel.ehp<=0||duel.php>duel.ehp);
+  if(draw){state.rating+=2;state.streak=0}
+  else if(win){state.wins++;state.streak++;if(state.streak>state.bestStreak)state.bestStreak=state.streak;state.rating+=18;sfxWin();toast("🏆 Victoire !")}
+  else{state.losses++;state.streak=0;state.rating=Math.max(800,state.rating-12);sfxLose()}
+  checkBadges();save();renderHome();
+  $("duelResult").classList.remove("hidden");
+  $("resultKicker").textContent=draw?"MATCH NUL":win?"VICTOIRE":"DÉFAITE";
+  $("resultTitle").textContent=draw?"ÉGALITÉ":win?"ADVERSAIRE À TERRE":"L'OMBRE A GAGNÉ";
+  $("resultCopy").textContent="Score : "+duel.php+" vs "+duel.ehp+" · cote "+state.rating;
+}
+function checkBadges(){
+  var b={};for(var i=0;i<state.badges.length;i++)b[state.badges[i]]=true;
+  if(state.correct>=10)b["🧠 10 BONNES"]=true;
+  if(state.bestCombo>=5)b["🔥 COMBO x5"]=true;
+  if(state.wins>=5)b["⚔ 5 VICTOIRES"]=true;
+  if(Object.keys(state.animeSeen).length>=10)b["📚 10 ANIME"]=true;
+  if(state.rating>=1500)b["👑 ÉLITE"]=true;
+  if(state.correct>=50)b["🌌 OTAKU GOD"]=true;
+  if(state.royaleWins>=1)b["👑 CHAMPION ROYALE"]=true;
+  if(state.rogueBest>=5)b["🔥 ARÈNE VÉTÉRAN"]=true;
+  if(state.rogueBest>=10)b["💎 MAÎTRE DE L'ARÈNE"]=true;
+  var arr=[];for(var k in b)arr.push(k);state.badges=arr;
+}
+
+var ROGUE_TOTAL=10;
+var ROGUE_DIFFS=["GENIN","CHŪNIN","JŌNIN","KAGE","LÉGENDE"];
+var ROGUE_ICONS=["👹","🐉","👺","🦊","🐺","🦂","🕷️","💀","🤖","👻"];
+var ROGUE_CARDS=[
+  {id:"dmg1",name:"Frappe Nette",icon:"⚔️",rar:"COMMUNE",desc:"+5 dégâts.",apply:function(){rogue.bonusDmg+=5}},
+  {id:"dmg2",name:"Lame Vorpale",icon:"🗡️",rar:"RARE",desc:"+12 dégâts.",apply:function(){rogue.bonusDmg+=12}},
+  {id:"time1",name:"Souffle Calme",icon:"🌀",rar:"COMMUNE",desc:"+3 secondes.",apply:function(){rogue.bonusTime+=3}},
+  {id:"regen1",name:"Récupération",icon:"💚",rar:"COMMUNE",desc:"+10 PV / combat.",apply:function(){rogue.regen+=10}},
+  {id:"regen2",name:"Phoenix",icon:"🔥",rar:"ÉPIQUE",desc:"+1 vie et +10 PV.",apply:function(){rogue.lives+=1;rogue.regen+=10}},
+  {id:"shield1",name:"Garde Critique",icon:"🛡️",rar:"RARE",desc:"Annule la 1re riposte.",apply:function(){rogue.shield+=1}},
+  {id:"shield2",name:"Aura d'Acier",icon:"💠",rar:"ÉPIQUE",desc:"Immunité à 1 erreur / combat.",apply:function(){rogue.immunity+=1}},
+  {id:"combo1",name:"Chaîne Brisée",icon:"⛓️",rar:"RARE",desc:"1 erreur ne casse plus le combo.",apply:function(){rogue.comboGuard+=1}},
+  {id:"crit1",name:"Œil du Chasseur",icon:"🎯",rar:"ÉPIQUE",desc:"Réponse <2s = critique.",apply:function(){rogue.crit=true}},
+  {id:"life1",name:"Cœur de Titan",icon:"❤️‍🔥",rar:"LÉGENDAIRE",desc:"+2 vies.",apply:function(){rogue.lives+=2}},
+  {id:"glass",name:"Vitre Céleste",icon:"💎",rar:"LÉGENDAIRE",desc:"+25 dégâts, −1 vie.",apply:function(){rogue.bonusDmg+=25;rogue.lives=Math.max(1,rogue.lives-1)}}
+];
+var RARITY={"COMMUNE":"border-slate-400/40 text-slate-200","RARE":"border-cyan-300/50 text-cyan-200","ÉPIQUE":"border-violet-400/60 text-violet-200","LÉGENDAIRE":"border-yellow-300/70 text-gold-300"};
+var rogue={active:false};
+
+function startRogue(){
+  showView("rogue");
+  $("rogueBest").textContent=state.rogueBest;
+  $("rogueIntro").classList.remove("hidden");
+  $("rogueFight").classList.add("hidden");
+  $("rogueCardScreen").classList.add("hidden");
+  $("rogueEnd").classList.add("hidden");
+}
+function rogueBegin(){
+  clearInterval(rogueTimer);
+  rogue={active:true,fight:0,lives:3,maxHp:100,hp:100,ehp:100,ehpMax:100,bonusDmg:0,bonusTime:0,regen:0,shield:0,immunity:0,comboGuard:0,crit:false,combo:0,answered:true,elapsed:0,lastTick:99,cards:[],shieldUsed:false,immunityUsed:false,comboGuardUsed:false,currentQ:null,tier:"GENIN",defeated:0};
+  $("rogueIntro").classList.add("hidden");$("rogueCardScreen").classList.add("hidden");$("rogueEnd").classList.add("hidden");$("rogueFight").classList.remove("hidden");
+  rogueNextFight();
+}
+function rogueNextFight(){
+  rogue.fight++;
+  if(rogue.fight>ROGUE_TOTAL)return rogueEnd(true);
+  var t=Math.min(ROGUE_DIFFS.length-1,Math.floor((rogue.fight-1)/2));
+  rogue.tier=ROGUE_DIFFS[t];
+  rogue.ehpMax=80+t*20;rogue.ehp=rogue.ehpMax;
+  rogue.answered=true;rogue.elapsed=0;rogue.lastTick=99;
+  rogue.shieldUsed=false;rogue.immunityUsed=false;rogue.comboGuardUsed=false;
+  $("rogueRound").textContent=rogue.fight;
+  $("rogueEnemyName").textContent=pick(enemyNames);
+  $("rogueEnemyIcon").textContent=pick(ROGUE_ICONS);
+  $("rogueEnemyDiff").textContent=rogue.tier;
+  renderRogueBuild();rogueUpdateHp();rogueRender();
+}
+function rogueRender(){
+  clearInterval(rogueTimer);
+  var pool=QUESTIONS.filter(function(x){return x.diff===rogue.tier});
+  if(!pool.length)pool=QUESTIONS;
+  var q=prepareQuestion(pick(pool));
+  rogue.currentQ=q;rogue.answered=false;rogue.elapsed=0;rogue.lastTick=99;
+  $("rogueMeta").textContent=q.anime+" · "+q.diff;
+  $("rogueCat").textContent=q.cat;
+  $("rogueEmoji").textContent=q.emoji;
+  $("rogueQ").textContent=q.q;
+  $("rogueFeedback").textContent="";
+  var h=$("rogueAnswers");h.innerHTML="";
+  q.a.forEach(function(x,i){var b=document.createElement("button");b.className="answer bg-white/5 border border-cyan-300/20 rounded-xl p-4 text-left font-bold card-in";b.style.animationDelay=(i*50)+"ms";b.textContent=(i+1)+". "+x;b.onclick=function(){rogueAnswer(i)};h.appendChild(b)});
+  $("rogueCombo").textContent="COMBO x"+rogue.combo;
+  var tmax=12+rogue.bonusTime;
+  $("rogueTimer").textContent=tmax.toFixed(1);
+  rogueTimer=setInterval(function(){rogue.elapsed+=.1;var left=Math.max(0,tmax-rogue.elapsed);$("rogueTimer").textContent=left.toFixed(1);var s=Math.ceil(left);if(s<=3&&s>0&&s!==rogue.lastTick){rogue.lastTick=s;sfxTick()}if(left<=0)rogueAnswer(-1)},100);
+}
+function rogueAnswer(choice){
+  if(rogue.answered||!rogue.currentQ)return;
+  rogue.answered=true;clearInterval(rogueTimer);
+  var q=rogue.currentQ,good=choice===q.ok;
+  var tmax=12+rogue.bonusTime,tleft=tmax-rogue.elapsed,fast=tleft>tmax-2;
+  var b=document.querySelectorAll("#rogueAnswers button");
+  for(var i=0;i<b.length;i++){b[i].disabled=true;if(i===q.ok)b[i].classList.add("correct");if(i===choice&&!good)b[i].classList.add("wrong")}
+  state.answers++;
+  if(!state.domains[q.cat])state.domains[q.cat]={correct:0,total:0};
+  state.domains[q.cat].total++;
+  if(!state.animeSeen[q.anime])state.animeSeen[q.anime]=0;
+  var fb=$("rogueFeedback");
+  if(good){
+    sfxGood();state.correct++;state.domains[q.cat].correct++;state.animeSeen[q.anime]++;rogue.combo++;
+    if(rogue.combo>state.bestCombo)state.bestCombo=rogue.combo;
+    var base=10+Math.floor(tleft*2),isCrit=false;
+    if(rogue.crit&&fast){base*=2;isCrit=true}
+    var dmg=base+rogue.bonusDmg;
+    rogue.ehp=Math.max(0,rogue.ehp-dmg);
+    fb.textContent=(isCrit?"⚡ CRIT · ":"")+"✓ −"+dmg+" PV";
+    rogueFloat("rogueEnemyFx","-"+dmg,"#61ffad");rogueShake("rogueEnemyCard");
+    addXp(4+Math.floor(dmg/3));
+  }else{
+    sfxBad();
+    if(rogue.immunity>0&&!rogue.immunityUsed){rogue.immunityUsed=true;fb.textContent="🛡️ Immunité"}
+    else{
+      rogue.hp=Math.max(0,rogue.hp-15);
+      fb.textContent="✗ −15 PV";
+      rogueFloat("roguePlayerFx","-15","#ff627e");rogueShake("roguePlayerCard");
+      if(rogue.comboGuard>0&&!rogue.comboGuardUsed){rogue.comboGuardUsed=true;fb.textContent+=" · combo gardé"}
+      else rogue.combo=0;
+    }
+  }
+  rogueUpdateHp();
+  $("rogueCombo").textContent="COMBO x"+rogue.combo;
+  save();
+  setTimeout(function(){
+    if(rogue.ehp<=0)return rogueWin();
+    if(rogue.hp<=0)return rogueEnd(false);
+    if(Math.random()<.55){
+      if(rogue.shield>0&&!rogue.shieldUsed){rogue.shieldUsed=true;fb.textContent+=" · 🛡️ riposte annulée"}
+      else{var ed=[6,10,14][Math.floor(Math.random()*3)];rogue.hp=Math.max(0,rogue.hp-ed);rogueFloat("roguePlayerFx","-"+ed,"#ff3ab7");rogueShake("roguePlayerCard");fb.textContent+=" · Riposte −"+ed;rogueUpdateHp()}
+    }
+    setTimeout(function(){if(rogue.hp<=0)return rogueEnd(false);if(rogue.ehp<=0)return rogueWin();rogueRender()},600);
+  },600);
+}
+function rogueWin(){rogue.defeated++;if(rogue.regen>0)rogue.hp=Math.min(rogue.maxHp,rogue.hp+rogue.regen);sfxWin();if(rogue.fight>=ROGUE_TOTAL)return rogueEnd(true);rogueOfferCards()}
+function rogueUpdateHp(){
+  var pp=Math.max(0,rogue.hp/rogue.maxHp*100),ep=rogue.ehpMax>0?Math.max(0,rogue.ehp/rogue.ehpMax*100):0;
+  $("roguePhp").style.width=pp+"%";$("rogueEhp").style.width=ep+"%";
+  $("roguePhpText").textContent=rogue.hp+"/"+rogue.maxHp;
+  $("rogueEhpText").textContent=rogue.ehp+"/"+rogue.ehpMax;
+  $("rogueLives").textContent="♥".repeat(Math.max(0,rogue.lives))+"♡".repeat(Math.max(0,5-rogue.lives));
+  $("roguePlayerCard").classList.toggle("pulse-danger",pp<25);
+}
+function rogueOfferCards(){
+  clearInterval(rogueTimer);
+  $("rogueFight").classList.add("hidden");$("rogueCardScreen").classList.remove("hidden");
+  var pool=ROGUE_CARDS.slice(),choices=[];
+  while(choices.length<3&&pool.length){var idx=Math.floor(Math.random()*pool.length);choices.push(pool.splice(idx,1)[0])}
+  var wrap=$("rogueCards");wrap.innerHTML="";
+  choices.forEach(function(c,i){
+    var el=document.createElement("button");
+    el.className="card-in glass rounded-2xl p-5 text-left border-2 "+RARITY[c.rar]+" hover:scale-105 transition-transform";
+    el.style.animationDelay=(i*100)+"ms";
+    el.innerHTML='<div class="text-4xl">'+c.icon+'</div><p class="text-[10px] font-bold tracking-widest mt-2 opacity-70">'+c.rar+'</p><h3 class="font-black text-lg mt-1">'+c.name+'</h3><p class="text-xs text-slate-300 mt-2">'+c.desc+'</p>';
+    el.onclick=function(){rogueTakeCard(c)};
+    wrap.appendChild(el);
+  });
+}
+function rogueTakeCard(c){
+  sfxCard();c.apply();rogue.cards.push(c);
+  $("rogueCardScreen").classList.add("hidden");$("rogueFight").classList.remove("hidden");
+  renderRogueBuild();toast(c.icon+" "+c.name);
+  rogueNextFight();
+}
+function renderRogueBuild(){
+  var el=$("rogueBuild");
+  if(!rogue.cards.length){el.innerHTML='<p class="text-slate-400">Aucune carte.</p>';return}
+  var counts={};
+  for(var i=0;i<rogue.cards.length;i++){var c=rogue.cards[i];if(!counts[c.id])counts[c.id]={card:c,n:0};counts[c.id].n++}
+  var html="";
+  for(var k in counts){var e=counts[k];html+='<div class="flex items-center gap-2 rounded-lg bg-white/5 px-2 py-1"><span class="text-lg">'+e.card.icon+'</span><span class="flex-1">'+e.card.name+'</span><b class="text-cyan-300">x'+e.n+'</b></div>'}
+  el.innerHTML=html;
+}
+function rogueFloat(fxId,text,color){
+  var wrap=$(fxId);if(!wrap)return;
+  var el=document.createElement("div");el.className="float-dmg";el.style.left=(30+Math.random()*40)+"%";el.style.top="40%";el.style.color=color;el.textContent=text;
+  wrap.appendChild(el);setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},900);
+}
+function rogueShake(id){var el=$(id);if(!el)return;el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}
+function rogueEnd(win){
+  clearInterval(rogueTimer);rogue.active=false;
+  $("rogueFight").classList.add("hidden");$("rogueCardScreen").classList.add("hidden");$("rogueEnd").classList.remove("hidden");
+  var reached=rogue.defeated;
+  if(reached>state.rogueBest)state.rogueBest=reached;
+  state.rogueRuns++;
+  var xpGain=reached*15,ratingGain=0;
+  if(win){xpGain+=120;ratingGain=60;sfxWin()}else{ratingGain=-10;sfxLose()}
+  addXp(xpGain);state.rating=Math.max(800,state.rating+ratingGain);
+  checkBadges();save();renderHome();
+  $("rogueEndKicker").textContent=win?"RUN COMPLÈTE":"RUN TERMINÉE";
+  $("rogueEndTitle").textContent=win?"🏆 MAÎTRE DE L'ARÈNE":"💀 TOMBÉ";
+  $("rogueEndCopy").textContent=reached+"/"+ROGUE_TOTAL+" combats · +"+xpGain+" XP · cote "+(ratingGain>=0?"+":"")+ratingGain+".";
+  $("rogueBest").textContent=state.rogueBest;
+}
+
+var royale={players:100,round:0,pos:100,hp:3,q:null,answered:true,over:true};
+var ROYALE_TARGETS=[64,32,16,8,4,2,1];
+function startRoyale(){
+  showView("royale");
+  royale={players:100,round:0,pos:100,hp:3,q:null,answered:true,over:false};
+  $("royaleQWrap").classList.add("hidden");$("royaleFeed").textContent="";
+  $("royaleStatus").textContent="Prêt.";
+  var btn=$("royaleBtn");btn.textContent="COMMENCER LA MANCHE";btn.disabled=false;
+  updateRoyale();
+}
+function updateRoyale(){$("royalePlayers").textContent=royale.players;$("royaleElim").textContent=100-royale.players;$("royalePos").textContent=royale.pos;$("royaleHp").textContent="♥".repeat(Math.max(0,royale.hp))+"♡".repeat(Math.max(0,3-royale.hp));$("royaleBar").style.width=((100-royale.players)/99*100)+"%"}
+function royaleStep(){
+  if(royale.over)return;
+  if(royale.round>=ROYALE_TARGETS.length){royale.players=1;royale.pos=1;updateRoyale();return finishRoyale(true)}
+  royale.round++;
+  royale.q=prepareQuestion(pick(QUESTIONS));
+  royale.answered=false;
+  $("royaleQWrap").classList.remove("hidden");
+  $("royaleCat").textContent=royale.q.anime+" · "+royale.q.cat;
+  $("royaleQ").textContent=royale.q.q;
+  $("royaleFeed").textContent="";
+  var h=$("royaleA");h.innerHTML="";
+  royale.q.a.forEach(function(x,i){var b=document.createElement("button");b.className="answer bg-white/5 border border-pink-300/20 rounded-xl p-4 text-left font-bold";b.textContent=(i+1)+". "+x;b.onclick=function(){answerRoyale(i)};h.appendChild(b)});
+  var btn=$("royaleBtn");btn.disabled=true;btn.textContent="RÉPONDS";
+  $("royaleStatus").textContent="Manche "+royale.round+"/7";
+}
+function answerRoyale(i){
+  if(royale.answered||!royale.q)return;
+  royale.answered=true;
+  var good=i===royale.q.ok;
+  var b=document.querySelectorAll("#royaleA button");
+  for(var k=0;k<b.length;k++){b[k].disabled=true;if(k===royale.q.ok)b[k].classList.add("correct");if(k===i&&!good)b[k].classList.add("wrong")}
+  royale.players=ROYALE_TARGETS[royale.round-1];
+  var feed=$("royaleFeed");
+  if(good){sfxGood();addXp(12);royale.pos=Math.max(1,royale.pos-1);feed.textContent="✓ Position "+royale.pos}
+  else{sfxBad();royale.hp--;royale.pos++;feed.textContent="✗ Vies : "+Math.max(0,royale.hp)}
+  updateRoyale();
+  if(royale.hp<=0){royale.over=true;feed.textContent="💀 ÉLIMINÉ !";return finishRoyale(false)}
+  var btn=$("royaleBtn");btn.disabled=false;
+  if(royale.round>=ROYALE_TARGETS.length){royale.players=1;royale.pos=1;updateRoyale();btn.textContent="VOIR LE RÉSULTAT"}
+  else{btn.textContent="MANCHE SUIVANTE"}
+}
+function finishRoyale(win){
+  royale.over=true;
+  var btn=$("royaleBtn");btn.disabled=false;btn.textContent="NOUVELLE ROYALE";
+  if(win){state.royaleWins++;addXp(60);state.rating+=15;sfxWin();$("royaleStatus").textContent="🏆 CHAMPION !"}
+  else{state.rating=Math.max(800,state.rating-8);sfxLose();$("royaleStatus").textContent="💀 Éliminé"}
+  checkBadges();save();renderHome();
+}
+
+var boss={i:0,score:0,total:20,pass:15,answered:true,pool:null,q:null};
+function startBoss(){
+  showView("boss");
+  boss={i:0,score:0,total:20,pass:15,answered:true,pool:null,q:null};
+  $("bossWrap").classList.remove("hidden");$("bossResult").classList.add("hidden");
+  renderBoss();
+}
+function renderBoss(){
+  boss.answered=false;
+  if(!boss.pool){boss.pool=QUESTIONS.slice();boss.pool.sort(function(){return Math.random()-.5})}
+  var q=prepareQuestion(boss.pool[boss.i%boss.pool.length]);boss.q=q;
+  $("bossProgress").textContent="QUESTION "+(boss.i+1)+"/"+boss.total;
+  $("bossScore").textContent=boss.score+" bonnes";
+  $("bossBar").style.width=(boss.i/boss.total*100)+"%";
+  $("bossCat").textContent=q.anime+" · "+q.cat;
+  $("bossQ").textContent=q.q;
+  $("bossF").textContent="";
+  var h=$("bossA");h.innerHTML="";
+  q.a.forEach(function(x,i){var b=document.createElement("button");b.className="answer bg-white/5 border border-violet-300/20 rounded-xl p-4 text-left font-bold";b.textContent=(i+1)+". "+x;b.onclick=function(){answerBoss(i)};h.appendChild(b)});
+}
+function answerBoss(i){
+  if(boss.answered||!boss.q)return;
+  boss.answered=true;
+  var q=boss.q,good=i===q.ok;
+  if(good){boss.score++;sfxGood()}else sfxBad();
+  $("bossF").textContent=good?"✓ CORRECT":"✗ INCORRECT";
+  var b=document.querySelectorAll("#bossA button");
+  for(var n=0;n<b.length;n++){b[n].disabled=true;if(n===q.ok)b[n].classList.add("correct");if(n===i&&!good)b[n].classList.add("wrong")}
+  setTimeout(function(){boss.i++;if(boss.i>=boss.total)return finishBoss();renderBoss()},550);
+}
+function finishBoss(){
+  var won=boss.score>=boss.pass;
+  var xp=won?90+Math.round((boss.score/boss.total)*30):30;
+  $("bossWrap").classList.add("hidden");$("bossResult").classList.remove("hidden");
+  $("bossTitle").textContent=(won?"🏆 BOSS VAINCU":"🔒 SCELLÉ")+" · "+boss.score+"/"+boss.total;
+  $("bossCopy").textContent=won?("+"+xp+" XP · cote +25"):("+"+xp+" XP");
+  addXp(xp);if(won){state.rating+=25;sfxWin()}else sfxLose();
+  checkBadges();save();renderHome();
+}
+
+function renderProfile(){
+  $("profileTitle").textContent=title();
+  $("profileLevel").textContent="NIVEAU "+level();
+  $("profileBar").style.width=xpPct()+"%";
+  $("profileXp").textContent=state.xp+" XP";
+  $("wins").textContent=state.wins;$("losses").textContent=state.losses;$("best").textContent=state.bestStreak;$("rating").textContent=state.rating;
+  if(state.badges.length){var h="";for(var i=0;i<state.badges.length;i++)h+='<span class="rounded-lg border border-gold-300/30 px-3 py-2 text-xs">'+state.badges[i]+'</span>';$("badges").innerHTML=h}
+  else $("badges").innerHTML="<span class='text-slate-400'>Aucun badge.</span>";
+}
+function renderRanking(list){
+  if(!list||!list.length){$("rankingList").innerHTML="<p class='text-slate-400'>Aucun joueur pour l'instant.</p>";return}
+  var html="";
+  for(var i=0;i<list.length;i++){
+    var p=list[i];var mine=currentUser&&p.uid===currentUser.uid;
+    html+='<div class="rank-row rounded-xl p-4 '+(mine?"bg-cyan-300/10 border border-cyan-300/40":"bg-white/5")+'"><b class="text-gold-300">#'+(i+1)+'</b><div><b>'+p.pseudo+'</b><small class="block text-slate-400">'+(p.wins||0)+' victoires</small></div><b class="text-cyan-300 text-right">'+(p.rating||1200)+'</b></div>';
+  }
+  $("rankingList").innerHTML=html;
+}
+
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT"||e.target.tagName==="TEXTAREA")return;
+  if(e.key==="Escape"){if(currentUser)showView("home");return}
+  var n=parseInt(e.key,10);
+  if(!n||n<1||n>4)return;
+  if($("duel").classList.contains("active"))answerDuel(n-1);
+  else if($("boss").classList.contains("active"))answerBoss(n-1);
+  else if($("royale").classList.contains("active"))answerRoyale(n-1);
+  else if($("rogue").classList.contains("active"))rogueAnswer(n-1);
+});
+
+auth.onAuthStateChanged(function(user){
+  if(user){
+    showApp(user);
+  }else{
+    currentUser = null;
+    if(unsubscribeLeaderboard){unsubscribeLeaderboard();unsubscribeLeaderboard=null}
+    $("appWrap").style.display = "none";
+    $("authScreen").style.display = "grid";
+    switchAuthTab("login");
+  }
+});
+
+setTimeout(function(){
+  if(auth.currentUser && !currentUser){
+    showApp(auth.currentUser);
+  }
+}, 500);
+
+switchAuthTab("login");
+</script>
+</body>
+</html>
