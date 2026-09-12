@@ -38,22 +38,38 @@ img,svg,video{max-width:100%;height:auto}
 .card-in{animation:cardIn .35s ease backwards}
 .pulse-danger{animation:pulseRed 1s infinite}
 @keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(255,58,183,.5)}50%{box-shadow:0 0 0 18px rgba(255,58,183,0)}}
+@keyframes pulseSearch{0%,100%{opacity:1}50%{opacity:.4}}
+.searching{animation:pulseSearch 1.4s infinite}
+
+header nav.desktop{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;max-width:100%}
+header nav.desktop::-webkit-scrollbar{display:none}
+header nav.desktop button{white-space:nowrap;flex-shrink:0}
+
 .mobilenav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:40;gap:2px;padding:6px;overflow-x:auto;overflow-y:hidden;border-radius:0;-webkit-overflow-scrolling:touch;max-width:100vw}
 .mobilenav::-webkit-scrollbar{height:0;display:none}
 .mobilenav button{flex:1 0 auto;min-width:60px;border:0;background:transparent;color:var(--muted);border-radius:10px;padding:6px 4px;font-size:10px;font-weight:800;line-height:1.3;cursor:pointer}
 .mobilenav button.active{color:var(--cyan);background:rgba(37,230,255,.12)}
+
 .auth-input{width:100%;padding:.75rem 1rem;border-radius:.6rem;background:#0b1230;border:1px solid rgba(37,230,255,.25);color:#fff;margin-bottom:.6rem;outline:none;font-size:14px}
 .auth-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,230,255,.15)}
 .btn-primary{width:100%;padding:.85rem;border-radius:.6rem;font-weight:900;cursor:pointer;border:0;background:linear-gradient(90deg,#25e6ff,#8067ff);color:#050719}
 .btn-secondary{width:100%;padding:.6rem;border-radius:.6rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.06);color:#f4f8ff;border:1px solid rgba(37,230,255,.25);font-size:12px}
 
-/* ================= TABLETTE ================= */
 @media(max-width:1100px){
   .avatar{width:64px;height:64px;font-size:24px}
   main{padding-left:12px!important;padding-right:12px!important}
 }
-
-/* ================= SMARTPHONE ================= */
+@media(max-width:1200px){
+  header .max-w-7xl{gap:6px!important}
+  header nav.desktop{font-size:10px!important;gap:0!important}
+  header nav.desktop button{padding:6px 6px!important;font-size:10px!important}
+  header .brand{font-size:.95rem!important}
+  #sound,#logoutBtn{padding:5px 7px!important;font-size:9px!important}
+}
+@media(max-width:900px){
+  header nav.desktop{font-size:9px!important}
+  header nav.desktop button{padding:5px 4px!important;font-size:9px!important}
+}
 @media(max-width:700px){
   .desktop{display:none}
   .mobilenav{display:flex}
@@ -61,41 +77,25 @@ img,svg,video{max-width:100%;height:auto}
   .avatar{width:48px;height:48px;font-size:20px;border-radius:14px}
   .rank-row{grid-template-columns:32px 1fr 70px;gap:8px}
   .brand{font-size:1rem}
-
-  /* Header compact */
   header .max-w-7xl{padding:8px 12px!important}
   #sound,#logoutBtn{padding:6px 8px!important;font-size:10px!important}
-
-  /* Cartes glass plus compactes */
   .glass{border-radius:14px}
   .glass.rounded-3xl{padding:16px!important}
   .glass.rounded-2xl{padding:12px!important}
-
-  /* Titres réduits */
   h1.brand{font-size:1.6rem!important;line-height:1.1!important}
   .text-4xl{font-size:1.4rem!important;line-height:1.2!important}
   .text-3xl{font-size:1.15rem!important}
   .text-2xl{font-size:1rem!important}
   .text-xl{font-size:.95rem!important}
   .text-lg{font-size:.85rem!important}
-
-  /* Questions compactes */
   #qText,#rogueQ,#royaleQ,#bossQ{font-size:1rem!important;line-height:1.25!important;margin-top:6px!important}
   #qMedia,#rogueEmoji{min-height:auto!important;padding:8px!important}
   #qEmoji{font-size:2.2rem!important}
   #qMediaText,#rogueMeta,#rogueCat,#bossCat,#qCat,#qMeta,#qDiff{font-size:10px!important}
-
-  /* Réponses compactes */
   #answers,#rogueAnswers,#royaleA,#bossA{gap:6px!important;margin-top:8px!important}
   #answers button,#rogueAnswers button,#royaleA button,#bossA button{padding:10px!important;font-size:13px!important;border-radius:10px!important}
-
-  /* Timer */
   #timer,#rogueTimer{font-size:1.1rem!important}
-
-  /* Barres PV compactes */
   .meter{height:6px!important}
-
-  /* Espacements verticaux réduits */
   .mt-7{margin-top:12px!important}
   .mt-6{margin-top:10px!important}
   .mt-5{margin-top:8px!important}
@@ -108,21 +108,13 @@ img,svg,video{max-width:100%;height:auto}
   .gap-3{gap:6px!important}
   .space-y-4>*+*{margin-top:6px!important}
   .space-y-2>*+*{margin-top:4px!important}
-
-  /* Home : stats compactes */
   .grid.md\:grid-cols-4{gap:6px!important}
   .grid.md\:grid-cols-4 .glass{padding:8px!important}
   .grid.md\:grid-cols-4 strong{font-size:1rem!important}
-
-  /* Boutons d'action accueil */
   #home button{padding:10px 14px!important;font-size:.85rem!important}
-
-  /* Empêcher le débordement */
   .grid{gap:10px!important}
   .grid>*{min-width:0}
 }
-
-/* ================= TRÈS PETIT (iPhone SE) ================= */
 @media(max-width:380px){
   #answers button,#rogueAnswers button,#royaleA button,#bossA button{font-size:12px!important;padding:8px!important}
   #qText,#rogueQ,#royaleQ,#bossQ{font-size:.9rem!important}
@@ -143,9 +135,17 @@ img,svg,video{max-width:100%;height:auto}
     <input id="authPseudo" type="text" placeholder="Pseudo (visible dans le classement)" maxlength="20" class="auth-input" style="display:none">
     <input id="authEmail" type="email" placeholder="Email" autocomplete="email" class="auth-input">
     <input id="authPassword" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password" class="auth-input">
+    <label id="authTermsWrap" style="display:none;align-items:flex-start;gap:.5rem;margin:.6rem 0;font-size:12px;color:#a9b7d7;cursor:pointer">
+      <input id="authTerms" type="checkbox" style="margin-top:.25rem;flex-shrink:0">
+      <span>J'accepte les <a href="legal.html" target="_blank" class="text-cyan-300 underline">CGU</a> et la <a href="legal.html" target="_blank" class="text-cyan-300 underline">politique de confidentialité</a>. Je certifie avoir 16 ans ou plus.</span>
+    </label>
     <p id="authMsg" style="color:#ff627e;font-size:12px;min-height:16px;margin-top:.3rem"></p>
     <button id="authSubmit" onclick="submitAuth()" class="btn-primary mt-3">SE CONNECTER</button>
     <button onclick="resetPasswordFlow()" class="btn-secondary mt-3">Mot de passe oublié ?</button>
+    <p class="text-center text-[10px] text-slate-500 mt-5">
+      Créé par <b class="text-cyan-300">Fath</b> · <a href="mailto:ciferulquiora07@gmail.com" class="text-gold-300">ciferulquiora07@gmail.com</a><br>
+      <a href="legal.html" class="text-cyan-300 underline">Mentions légales · CGU · Confidentialité</a>
+    </p>
   </div>
 </section>
 
@@ -295,13 +295,26 @@ img,svg,video{max-width:100%;height:auto}
 <section id="profile" class="view"><div class="glass rounded-3xl p-7"><p class="text-xs text-cyan-300 font-bold tracking-widest">IDENTITÉ DE COMBAT</p><h1 class="text-4xl font-black mt-2">PROFIL</h1>
 <div class="grid lg:grid-cols-3 gap-5 mt-7">
 <div class="bg-white/5 rounded-2xl p-5"><h2 id="profileTitle" class="text-2xl font-black">Débutant</h2><p id="profileLevel" class="text-cyan-300">NIVEAU 1</p><div class="meter mt-5"><span id="profileBar" style="width:0%;background:linear-gradient(90deg,#25e6ff,#8067ff)"></span></div><p id="profileXp" class="text-sm text-slate-300 mt-2"></p></div>
-<div class="bg-white/5 rounded-2xl p-5"><h2 class="font-bold">PALMARÈS</h2><p class="mt-4">Victoires <b id="wins" class="float-right text-cyan-300">0</b></p><p class="mt-3">Défaites <b id="losses" class="float-right text-pink-300">0</b></p><p class="mt-3">Meilleure série <b id="best" class="float-right text-gold-300">0</b></p><p class="mt-3">Cote <b id="rating" class="float-right text-violet-300">1200</b></p></div>
+<div class="bg-white/5 rounded-2xl p-5">
+  <h2 class="font-bold">PALMARÈS</h2>
+  <p class="mt-4">Victoires <b id="wins" class="float-right text-cyan-300">0</b></p>
+  <p class="mt-3">Défaites <b id="losses" class="float-right text-pink-300">0</b></p>
+  <p class="mt-3">Meilleure série <b id="best" class="float-right text-gold-300">0</b></p>
+  <p class="mt-3">Cote <b id="rating" class="float-right text-violet-300">1200</b></p>
+  <hr class="my-4 border-pink-400/20">
+  <a href="legal.html" target="_blank" class="block text-xs text-cyan-300 underline mb-3">Mentions légales · CGU · Confidentialité</a>
+  <button onclick="deleteAccount()" class="w-full rounded-lg border border-pink-400/40 px-4 py-2 text-xs font-bold text-pink-300">🗑 SUPPRIMER MON COMPTE</button>
+</div>
 <div class="bg-white/5 rounded-2xl p-5"><h2 class="font-bold">BADGES</h2><div id="badges" class="flex flex-wrap gap-2 mt-4"></div></div>
 </div></div></section>
 
 <section id="ranking" class="view"><div class="glass rounded-3xl p-7"><p class="text-xs text-gold-300 font-bold tracking-widest">LIGUE NÉON · TEMPS RÉEL</p><h1 class="text-4xl font-black mt-2">CLASSEMENT GLOBAL</h1><p class="text-xs text-slate-400 mt-2">Mis à jour en direct entre tous les joueurs.</p><div id="rankingList" class="space-y-2 mt-6"><p class="text-slate-400">Chargement…</p></div></div></section>
 
-<footer class="text-center text-xs text-slate-500 mt-10">OTAKU ARENA · synchronisé via Firebase</footer>
+<footer class="text-center text-xs text-slate-500 mt-10 mb-4 px-4">
+  OTAKU ARENA · Créé par <b class="text-cyan-300">Fath</b><br>
+  <a href="mailto:ciferulquiora07@gmail.com" class="text-gold-300 hover:text-cyan-300 transition-colors">ciferulquiora07@gmail.com</a><br>
+  <a href="legal.html" class="text-cyan-300 underline mt-2 inline-block">Mentions légales · CGU · Confidentialité</a>
+</footer>
 </main>
 
 <nav class="mobilenav glass">
@@ -392,6 +405,8 @@ function switchAuthTab(mode){
   $("tabLogin").style.background = mode==="login" ? "rgba(37,230,255,.15)" : "transparent";
   $("tabSignup").style.background = mode==="signup" ? "rgba(37,230,255,.15)" : "transparent";
   $("authPseudo").style.display = mode==="signup" ? "block" : "none";
+  $("authTermsWrap").style.display = mode==="signup" ? "flex" : "none";
+  if(mode==="login"){$("authTerms").checked=false}
   $("authSubmit").textContent = mode==="login" ? "SE CONNECTER" : "CRÉER MON COMPTE";
   $("authMsg").textContent="";$("authMsg").style.color="#ff627e";
 }
@@ -418,6 +433,7 @@ function submitAuth(){
   if(!email || !password) return setAuthMsg("Email et mot de passe requis.");
   if(password.length < 6) return setAuthMsg("Mot de passe : 6 caractères minimum.");
   if(authMode==="signup" && pseudo.length < 3) return setAuthMsg("Pseudo : 3 caractères minimum.");
+  if(authMode==="signup" && !$("authTerms").checked) return setAuthMsg("Tu dois accepter les CGU et la politique de confidentialité.");
   setAuthMsg("Connexion…", true);
 
   if(authMode==="signup"){
@@ -471,6 +487,26 @@ function resetPasswordFlow(){
 }
 function logout(){
   if(confirm("Se déconnecter ?")) auth.signOut();
+}
+function deleteAccount(){
+  if(!currentUser) return;
+  var confirm1 = confirm("⚠️ SUPPRESSION DÉFINITIVE\n\nCette action est IRRÉVERSIBLE.\n\nToutes tes données seront effacées : profil, statistiques, classement, compte.\n\nContinuer ?");
+  if(!confirm1) return;
+  var confirm2 = prompt("Pour confirmer, tape exactement : SUPPRIMER");
+  if(confirm2 !== "SUPPRIMER"){ toast("Suppression annulée."); return; }
+  var uid = currentUser.uid;
+  db.collection("profiles").doc(uid).delete().catch(function(e){console.warn(e)});
+  db.collection("leaderboard").doc(uid).delete().catch(function(e){console.warn(e)});
+  currentUser.delete().then(function(){
+    toast("✅ Compte supprimé définitivement.");
+  }).catch(function(e){
+    if(e.code === "auth/requires-recent-login"){
+      alert("Pour des raisons de sécurité, reconnecte-toi puis réessaie la suppression.");
+      auth.signOut();
+    }else{
+      alert("Erreur lors de la suppression : " + e.code);
+    }
+  });
 }
 
 function loadProfile(user){
