@@ -2,15 +2,16 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>OTAKU ARENA</title>
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <style>
 :root{--ink:#050719;--panel:rgba(13,20,51,.84);--cyan:#25e6ff;--magenta:#ff3ab7;--violet:#8067ff;--gold:#ffd166;--muted:#a9b7d7}
-*{box-sizing:border-box}
-  
-body{margin:0;color:#f4f8ff;font-family:Inter,system-ui,sans-serif;background:var(--ink);overflow-x:hidden}
+*{box-sizing:border-box;min-width:0}
+html,body{overflow-x:hidden;max-width:100vw;width:100%}
+body{margin:0;color:#f4f8ff;font-family:Inter,system-ui,sans-serif;background:var(--ink)}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(37,230,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(37,230,255,.025) 1px,transparent 1px);background-size:38px 38px;z-index:0}
+img,svg,video{max-width:100%;height:auto}
 .app{position:relative;z-index:1;min-height:100vh}
 .glass{background:var(--panel);border:1px solid rgba(91,221,255,.22);box-shadow:0 18px 45px rgba(0,0,0,.25);backdrop-filter:blur(15px)}
 .brand{font-family:monospace;letter-spacing:.1em;text-shadow:0 0 22px rgba(37,230,255,.55)}
@@ -37,25 +38,101 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 .card-in{animation:cardIn .35s ease backwards}
 .pulse-danger{animation:pulseRed 1s infinite}
 @keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(255,58,183,.5)}50%{box-shadow:0 0 0 18px rgba(255,58,183,0)}}
-.mobilenav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:40;gap:2px;padding:6px;overflow-x:auto;border-radius:0}
+.mobilenav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:40;gap:2px;padding:6px;overflow-x:auto;overflow-y:hidden;border-radius:0;-webkit-overflow-scrolling:touch;max-width:100vw}
+.mobilenav::-webkit-scrollbar{height:0;display:none}
 .mobilenav button{flex:1 0 auto;min-width:60px;border:0;background:transparent;color:var(--muted);border-radius:10px;padding:6px 4px;font-size:10px;font-weight:800;line-height:1.3;cursor:pointer}
 .mobilenav button.active{color:var(--cyan);background:rgba(37,230,255,.12)}
 .auth-input{width:100%;padding:.75rem 1rem;border-radius:.6rem;background:#0b1230;border:1px solid rgba(37,230,255,.25);color:#fff;margin-bottom:.6rem;outline:none;font-size:14px}
 .auth-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,230,255,.15)}
 .btn-primary{width:100%;padding:.85rem;border-radius:.6rem;font-weight:900;cursor:pointer;border:0;background:linear-gradient(90deg,#25e6ff,#8067ff);color:#050719}
 .btn-secondary{width:100%;padding:.6rem;border-radius:.6rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.06);color:#f4f8ff;border:1px solid rgba(37,230,255,.25);font-size:12px}
+
+/* ================= TABLETTE ================= */
+@media(max-width:1100px){
+  .avatar{width:64px;height:64px;font-size:24px}
+  main{padding-left:12px!important;padding-right:12px!important}
+}
+
+/* ================= SMARTPHONE ================= */
 @media(max-width:700px){
   .desktop{display:none}
-  .avatar{width:58px;height:58px}
-  .rank-row{grid-template-columns:35px 1fr 70px}
   .mobilenav{display:flex}
-  main{padding-bottom:8rem!important}
+  main{padding:10px 10px 5.5rem!important}
+  .avatar{width:48px;height:48px;font-size:20px;border-radius:14px}
+  .rank-row{grid-template-columns:32px 1fr 70px;gap:8px}
+  .brand{font-size:1rem}
+
+  /* Header compact */
+  header .max-w-7xl{padding:8px 12px!important}
+  #sound,#logoutBtn{padding:6px 8px!important;font-size:10px!important}
+
+  /* Cartes glass plus compactes */
+  .glass{border-radius:14px}
+  .glass.rounded-3xl{padding:16px!important}
+  .glass.rounded-2xl{padding:12px!important}
+
+  /* Titres réduits */
+  h1.brand{font-size:1.6rem!important;line-height:1.1!important}
+  .text-4xl{font-size:1.4rem!important;line-height:1.2!important}
+  .text-3xl{font-size:1.15rem!important}
+  .text-2xl{font-size:1rem!important}
+  .text-xl{font-size:.95rem!important}
+  .text-lg{font-size:.85rem!important}
+
+  /* Questions compactes */
+  #qText,#rogueQ,#royaleQ,#bossQ{font-size:1rem!important;line-height:1.25!important;margin-top:6px!important}
+  #qMedia,#rogueEmoji{min-height:auto!important;padding:8px!important}
+  #qEmoji{font-size:2.2rem!important}
+  #qMediaText,#rogueMeta,#rogueCat,#bossCat,#qCat,#qMeta,#qDiff{font-size:10px!important}
+
+  /* Réponses compactes */
+  #answers,#rogueAnswers,#royaleA,#bossA{gap:6px!important;margin-top:8px!important}
+  #answers button,#rogueAnswers button,#royaleA button,#bossA button{padding:10px!important;font-size:13px!important;border-radius:10px!important}
+
+  /* Timer */
+  #timer,#rogueTimer{font-size:1.1rem!important}
+
+  /* Barres PV compactes */
+  .meter{height:6px!important}
+
+  /* Espacements verticaux réduits */
+  .mt-7{margin-top:12px!important}
+  .mt-6{margin-top:10px!important}
+  .mt-5{margin-top:8px!important}
+  .mt-4{margin-top:6px!important}
+  .mb-5{margin-bottom:8px!important}
+  .mb-4{margin-bottom:6px!important}
+  .py-7{padding-top:10px!important;padding-bottom:10px!important}
+  .gap-5{gap:10px!important}
+  .gap-4{gap:8px!important}
+  .gap-3{gap:6px!important}
+  .space-y-4>*+*{margin-top:6px!important}
+  .space-y-2>*+*{margin-top:4px!important}
+
+  /* Home : stats compactes */
+  .grid.md\:grid-cols-4{gap:6px!important}
+  .grid.md\:grid-cols-4 .glass{padding:8px!important}
+  .grid.md\:grid-cols-4 strong{font-size:1rem!important}
+
+  /* Boutons d'action accueil */
+  #home button{padding:10px 14px!important;font-size:.85rem!important}
+
+  /* Empêcher le débordement */
+  .grid{gap:10px!important}
+  .grid>*{min-width:0}
+}
+
+/* ================= TRÈS PETIT (iPhone SE) ================= */
+@media(max-width:380px){
+  #answers button,#rogueAnswers button,#royaleA button,#bossA button{font-size:12px!important;padding:8px!important}
+  #qText,#rogueQ,#royaleQ,#bossQ{font-size:.9rem!important}
+  .avatar{width:40px;height:40px;font-size:16px}
 }
 </style>
 </head>
 <body>
 
-<section id="authScreen" style="position:relative;z-index:100;min-height:100vh;display:grid;place-items:center;padding:0 1rem">
+<section id="authScreen" style="position:relative;z-index:100;min-height:100vh;display:grid;place-items:center;padding:1rem">
   <div class="glass rounded-3xl p-8 w-full max-w-md">
     <p class="brand text-3xl text-cyan-300 font-black text-center">OTAKU ARENA</p>
     <p class="text-center text-xs text-slate-400 mt-2 mb-6">Connecte-toi pour rejoindre l'arène</p>
@@ -87,11 +164,11 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 </nav>
 <div class="flex gap-2">
 <button id="sound" onclick="toggleSound()" class="rounded-lg border border-cyan-300/30 px-3 py-2 text-xs">SON : ON</button>
-<button onclick="logout()" class="rounded-lg border border-pink-400/40 px-3 py-2 text-xs text-pink-300 font-bold">DÉCO</button>
+<button id="logoutBtn" onclick="logout()" class="rounded-lg border border-pink-400/40 px-3 py-2 text-xs text-pink-300 font-bold">DÉCO</button>
 </div>
 </div></header>
 
-<main class="max-w-7xl mx-auto px-4 py-7 pb-24">
+<main class="max-w-7xl mx-auto px-4 py-7 pb-24 w-full">
 
 <section id="home" class="view active">
 <div class="grid lg:grid-cols-12 gap-5">
@@ -157,7 +234,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 </div>
 <div id="rogueFight" class="hidden">
 <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
-<div><p class="text-xs text-gold-300 font-bold tracking-widest">COMBAT <span id="rogueRound">1</span>/10</p><h1 class="text-3xl font-black">🔥 ARÈNE ROGUELITE</h1></div>
+<div><p class="text-xs text-gold-300 font-bold tracking-widest">COMBAT <span id="rogueRound">1</span>/10</p><h1 class="text-3xl font-black">🔥 ARÈNE</h1></div>
 <div class="flex gap-2 flex-wrap">
 <div class="glass rounded-xl px-4 py-2 text-center"><small>VIES</small><strong id="rogueLives" class="block text-xl text-gold-300">♥♥♥</strong></div>
 <div class="glass rounded-xl px-4 py-2 text-center"><small>TEMPS</small><strong id="rogueTimer" class="block text-2xl text-gold-300">12.0</strong></div>
@@ -277,7 +354,6 @@ var enemyNames=["KuroNeko","MikaByte","SoraFlux","RinKaze","AkumaSensei","NekoRo
 function level(){return Math.floor(state.xp/120)+1}
 function title(){return titles[Math.min(titles.length-1,Math.floor(state.xp/180))]}
 function xpPct(){return (state.xp%120)/120*100}
-function accuracy(){return state.answers?Math.round(state.correct/state.answers*100):0}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function $(id){return document.getElementById(id)}
 
