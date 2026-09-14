@@ -40,21 +40,31 @@ img,svg,video{max-width:100%;height:auto}
 @keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(255,58,183,.5)}50%{box-shadow:0 0 0 18px rgba(255,58,183,0)}}
 @keyframes pulseSearch{0%,100%{opacity:1}50%{opacity:.4}}
 .searching{animation:pulseSearch 1.4s infinite}
-
+.player-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(91,221,255,.12);transition:.15s}
+.player-row:hover{background:rgba(37,230,255,.06);border-color:rgba(37,230,255,.3)}
+.player-row .avatar-sm{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#25e6ff,#8067ff);display:grid;place-items:center;font-weight:900;font-size:15px;flex-shrink:0}
+.player-row .info{flex:1;min-width:0}
+.player-row .info b{display:block;font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-row .info small{color:#a9b7d7;font-size:11px}
+.player-row .btn-defier{background:linear-gradient(90deg,#25e6ff,#8067ff);color:#050719;font-weight:900;padding:8px 14px;border-radius:10px;border:0;cursor:pointer;font-size:12px;flex-shrink:0}
+.player-row .btn-defier:hover{transform:scale(1.05)}
+.player-row .btn-defier:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.nav-badge{position:relative}
+.nav-badge::after{content:attr(data-badge);position:absolute;top:-4px;right:-4px;background:#ff3ab7;color:#fff;font-size:9px;font-weight:900;padding:2px 5px;border-radius:999px;min-width:16px;text-align:center;line-height:1.2;box-shadow:0 0 8px rgba(255,58,183,.6)}
+.nav-badge[data-badge="0"]::after{display:none}
+@keyframes popupIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+#duelPopup .glass,#rematchPopup .glass{animation:popupIn .3s cubic-bezier(.2,.9,.3,1.3)}
 header nav.desktop{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;max-width:100%}
 header nav.desktop::-webkit-scrollbar{display:none}
 header nav.desktop button{white-space:nowrap;flex-shrink:0}
-
 .mobilenav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:40;gap:2px;padding:6px;overflow-x:auto;overflow-y:hidden;border-radius:0;-webkit-overflow-scrolling:touch;max-width:100vw}
 .mobilenav::-webkit-scrollbar{height:0;display:none}
 .mobilenav button{flex:1 0 auto;min-width:60px;border:0;background:transparent;color:var(--muted);border-radius:10px;padding:6px 4px;font-size:10px;font-weight:800;line-height:1.3;cursor:pointer}
 .mobilenav button.active{color:var(--cyan);background:rgba(37,230,255,.12)}
-
 .auth-input{width:100%;padding:.75rem 1rem;border-radius:.6rem;background:#0b1230;border:1px solid rgba(37,230,255,.25);color:#fff;margin-bottom:.6rem;outline:none;font-size:14px}
 .auth-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,230,255,.15)}
 .btn-primary{width:100%;padding:.85rem;border-radius:.6rem;font-weight:900;cursor:pointer;border:0;background:linear-gradient(90deg,#25e6ff,#8067ff);color:#050719}
 .btn-secondary{width:100%;padding:.6rem;border-radius:.6rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.06);color:#f4f8ff;border:1px solid rgba(37,230,255,.25);font-size:12px}
-
 @media(max-width:1100px){
   .avatar{width:64px;height:64px;font-size:24px}
   main{padding-left:12px!important;padding-right:12px!important}
@@ -88,13 +98,13 @@ header nav.desktop button{white-space:nowrap;flex-shrink:0}
   .text-2xl{font-size:1rem!important}
   .text-xl{font-size:.95rem!important}
   .text-lg{font-size:.85rem!important}
-  #qText,#rogueQ,#royaleQ,#bossQ{font-size:1rem!important;line-height:1.25!important;margin-top:6px!important}
+  #qText,#rogueQ,#royaleQ,#bossQ,#onlineQ{font-size:1rem!important;line-height:1.25!important;margin-top:6px!important}
   #qMedia,#rogueEmoji{min-height:auto!important;padding:8px!important}
   #qEmoji{font-size:2.2rem!important}
-  #qMediaText,#rogueMeta,#rogueCat,#bossCat,#qCat,#qMeta,#qDiff{font-size:10px!important}
-  #answers,#rogueAnswers,#royaleA,#bossA{gap:6px!important;margin-top:8px!important}
-  #answers button,#rogueAnswers button,#royaleA button,#bossA button{padding:10px!important;font-size:13px!important;border-radius:10px!important}
-  #timer,#rogueTimer{font-size:1.1rem!important}
+  #qMediaText,#rogueMeta,#rogueCat,#bossCat,#qCat,#qMeta,#qDiff,#onlineCat,#onlineMeta{font-size:10px!important}
+  #answers,#rogueAnswers,#royaleA,#bossA,#onlineA{gap:6px!important;margin-top:8px!important}
+  #answers button,#rogueAnswers button,#royaleA button,#bossA button,#onlineA button{padding:10px!important;font-size:13px!important;border-radius:10px!important}
+  #timer,#rogueTimer,#onlineTimer,#onlineMatchTimer{font-size:1.1rem!important}
   .meter{height:6px!important}
   .mt-7{margin-top:12px!important}
   .mt-6{margin-top:10px!important}
@@ -116,8 +126,8 @@ header nav.desktop button{white-space:nowrap;flex-shrink:0}
   .grid>*{min-width:0}
 }
 @media(max-width:380px){
-  #answers button,#rogueAnswers button,#royaleA button,#bossA button{font-size:12px!important;padding:8px!important}
-  #qText,#rogueQ,#royaleQ,#bossQ{font-size:.9rem!important}
+  #answers button,#rogueAnswers button,#royaleA button,#bossA button,#onlineA button{font-size:12px!important;padding:8px!important}
+  #qText,#rogueQ,#royaleQ,#bossQ,#onlineQ{font-size:.9rem!important}
   .avatar{width:40px;height:40px;font-size:16px}
 }
 </style>
@@ -156,6 +166,7 @@ header nav.desktop button{white-space:nowrap;flex-shrink:0}
 <nav class="desktop flex gap-1 text-xs font-bold">
 <button data-nav="home" onclick="showView('home')" class="px-3 py-2">ACCUEIL</button>
 <button data-nav="duel" onclick="startDuel()" class="px-3 py-2">DUEL</button>
+<button data-nav="online" onclick="startOnline()" class="px-3 py-2 text-cyan-300">🌐 EN LIGNE</button>
 <button data-nav="rogue" onclick="startRogue()" class="px-3 py-2 text-gold-300">🔥 ARÈNE</button>
 <button data-nav="royale" onclick="startRoyale()" class="px-3 py-2">ROYALE</button>
 <button data-nav="boss" onclick="startBoss()" class="px-3 py-2">BOSS</button>
@@ -178,6 +189,7 @@ header nav.desktop button{white-space:nowrap;flex-shrink:0}
 <p class="text-lg text-slate-300 mt-4 max-w-2xl">Affronte des otaku, reconnais les personnages, les techniques, les arcs et les openings, puis grimpe jusqu'au rang OTAKU GOD.</p>
 <p class="text-xs text-gold-300 mt-3">📚 <b id="questionCount">0</b> questions chargées</p>
 <div class="flex flex-wrap gap-3 mt-7">
+<button onclick="startOnline()" class="bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 font-black rounded-xl px-6 py-4 shadow-lg shadow-cyan-500/30">🌐 DUEL EN LIGNE</button>
 <button onclick="startDuel()" class="bg-cyan-300 text-slate-950 font-black rounded-xl px-6 py-4">⚔ LANCER UN DUEL</button>
 <button onclick="startRogue()" class="bg-gradient-to-r from-yellow-300 to-pink-400 text-slate-950 font-black rounded-xl px-6 py-4">🔥 ARÈNE ROGUELITE</button>
 <button onclick="startRoyale()" class="bg-magenta-500/20 border border-magenta-400/40 rounded-xl px-5 py-4 font-bold">👑 OTAKU ROYALE</button>
@@ -219,6 +231,112 @@ header nav.desktop button{white-space:nowrap;flex-shrink:0}
 </aside></div>
 <div id="duelResult" class="hidden glass rounded-3xl p-8 mt-5 text-center"><p id="resultKicker" class="text-xs text-cyan-300 font-bold"></p><h2 id="resultTitle" class="text-4xl font-black mt-2"></h2><p id="resultCopy" class="text-slate-300 mt-3"></p><button onclick="startDuel()" class="mt-6 bg-cyan-300 text-slate-950 rounded-xl px-6 py-3 font-black">REJOUER</button></div>
 </section>
+
+<section id="online" class="view">
+  <div id="onlineLobby">
+    <div class="glass rounded-3xl p-5 md:p-7">
+      <p class="text-xs text-cyan-300 font-bold tracking-widest">MULTIJOUEUR TEMPS RÉEL</p>
+      <h1 class="text-3xl md:text-4xl font-black mt-2">🌐 SALLE D'ATTENTE</h1>
+      <p class="text-slate-300 mt-2 text-sm max-w-2xl">Choisis ton adversaire dans la liste ou entre dans la file pour être visible par les autres.</p>
+      <div class="flex flex-wrap gap-2 mt-5">
+        <button id="onlineJoinBtn" onclick="joinQueue()" class="bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 font-black rounded-xl px-5 py-3 text-sm">📡 ENTRER DANS LA FILE</button>
+        <button id="onlineLeaveBtn" onclick="leaveQueue()" class="hidden bg-pink-500/20 border border-pink-300/40 rounded-xl px-5 py-3 font-bold text-sm">🚪 QUITTER LA FILE</button>
+        <div class="glass rounded-xl px-4 py-3 text-xs"><span class="text-slate-400">En ligne :</span> <b id="onlineCount" class="text-cyan-300">0</b></div>
+        <div id="myQueueStatus" class="hidden glass rounded-xl px-4 py-3 text-xs border-cyan-300/40"><span class="text-slate-400">Ton statut :</span> <b class="text-gold-300">Dans la file</b></div>
+      </div>
+      <div class="mt-5">
+        <input id="onlineSearchInput" type="text" placeholder="🔍 Rechercher un pseudo…" class="w-full rounded-xl bg-slate-950 border border-cyan-300/20 px-4 py-3 text-sm focus:border-cyan-300 focus:outline-none">
+      </div>
+    </div>
+    <div class="glass rounded-3xl p-5 md:p-7 mt-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-black text-lg">JOUEURS DISPONIBLES</h2>
+        <span class="text-xs text-slate-400" id="onlineListCount">0 joueur</span>
+      </div>
+      <div id="onlinePlayersList" class="space-y-2">
+        <p class="text-slate-400 text-sm text-center py-8">Aucun joueur pour l'instant.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="onlineFight" class="hidden">
+    <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+      <div>
+        <p class="text-xs text-cyan-300 font-bold tracking-widest">DUEL EN DIRECT</p>
+        <h1 class="text-3xl font-black">🌐 <span id="onlineQuestionNum">1</span></h1>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <div class="glass rounded-xl px-4 py-3 text-center"><small>MANCHE</small><strong id="onlineTimer" class="block text-2xl text-gold-300">10.0</strong></div>
+        <div class="glass rounded-xl px-4 py-3 text-center"><small>MATCH</small><strong id="onlineMatchTimer" class="block text-2xl text-cyan-300">2:00</strong></div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <div id="onlinePlayerCard" class="glass rounded-2xl p-5 relative overflow-hidden">
+        <div class="flex gap-4 items-center"><div class="avatar">O</div><div class="flex-1"><p class="text-xs text-cyan-300">TOI · <span id="onlineCombo">COMBO x0</span></p><h2 id="onlineMeName" class="font-black">Moi</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="onlinePhpText">100/100</span></div><div class="meter mt-2"><span id="onlinePhp" style="width:100%;background:linear-gradient(90deg,#25e6ff,#57ffca)"></span></div></div></div>
+        <div id="onlinePlayerFx" class="absolute inset-0 pointer-events-none"></div>
+      </div>
+      <div id="onlineEnemyCard" class="glass rounded-2xl p-5 relative overflow-hidden">
+        <div class="flex gap-4 items-center"><div class="avatar" style="background:linear-gradient(135deg,#ff3ab7,#52265f)" id="onlineEnemyIcon">K</div><div class="flex-1"><p class="text-xs text-pink-300">ADVERSAIRE</p><h2 id="onlineEnemyName" class="font-black">...</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="onlineEhpText">100/100</span></div><div class="meter mt-2"><span id="onlineEhp" style="width:100%;background:linear-gradient(90deg,#ff3ab7,#ff8a65)"></span></div></div></div>
+        <div id="onlineEnemyFx" class="absolute inset-0 pointer-events-none"></div>
+      </div>
+    </div>
+
+    <section class="glass rounded-2xl p-5 mt-5">
+      <div class="flex justify-between"><span id="onlineMeta" class="text-xs font-bold text-violet-300"></span><span id="onlineCat" class="text-xs font-bold text-gold-300"></span></div>
+      <div id="onlineMedia" class="rounded-xl mt-4 min-h-28 grid place-items-center bg-gradient-to-br from-indigo-950 to-fuchsia-950 border border-cyan-300/20 text-center p-6">
+        <div><div id="onlineEmoji" class="text-6xl">❓</div></div></div>
+      <h2 id="onlineQ" class="text-xl md:text-2xl font-black mt-4"></h2>
+      <div id="onlineA" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
+      <p id="onlineF" class="min-h-6 text-center font-bold text-gold-300 mt-4"></p>
+    </section>
+
+    <div id="onlineResult" class="hidden glass rounded-3xl p-8 mt-5 text-center">
+      <p id="onlineResultKicker" class="text-xs text-cyan-300 font-bold tracking-widest"></p>
+      <div id="onlineResultIcon" class="text-6xl mt-3">🏆</div>
+      <h2 id="onlineResultTitle" class="text-4xl font-black mt-2"></h2>
+      <p id="onlineResultCopy" class="text-slate-300 mt-3"></p>
+      <div class="flex gap-3 justify-center mt-7 flex-wrap">
+        <button onclick="relaunchOnlineDuel()" class="bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 font-black rounded-xl px-6 py-3">🔄 RELANCER LE DUEL</button>
+        <button onclick="backToLobby()" class="bg-white/5 border border-cyan-300/20 rounded-xl px-6 py-3 font-bold">RETOUR AU LOBBY</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="duelPopup" style="position:fixed;inset:0;z-index:9999;display:none;place-items:center;background:rgba(5,7,25,.85);backdrop-filter:blur(8px);padding:1rem">
+  <div class="glass rounded-3xl p-6 max-w-sm w-full text-center">
+    <p class="text-xs text-pink-300 font-bold tracking-widest">NOUVEAU DÉFI</p>
+    <div class="text-5xl mt-3">⚔️</div>
+    <h2 class="text-2xl font-black mt-3"><span id="popupChallengerName" class="text-cyan-300">Joueur</span> te défie !</h2>
+    <p class="text-xs text-slate-400 mt-2">Cote : <b id="popupChallengerRating" class="text-gold-300">1200</b></p>
+    <div class="mt-4">
+      <div class="meter"><span id="popupTimerBar" style="width:100%;background:linear-gradient(90deg,#25e6ff,#ff3ab7);transition:width 1s linear"></span></div>
+      <p class="text-xs text-slate-400 mt-2">Expire dans <b id="popupTimerText" class="text-gold-300">20</b>s</p>
+    </div>
+    <div class="flex gap-2 mt-5">
+      <button id="popupAcceptBtn" class="flex-1 bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 font-black rounded-xl px-4 py-3">ACCEPTER</button>
+      <button id="popupDeclineBtn" class="flex-1 bg-pink-500/20 border border-pink-300/40 rounded-xl px-4 py-3 font-bold">REFUSER</button>
+    </div>
+  </div>
+</div>
+
+<div id="rematchPopup" style="position:fixed;inset:0;z-index:9999;display:none;place-items:center;background:rgba(5,7,25,.85);backdrop-filter:blur(8px);padding:1rem">
+  <div class="glass rounded-3xl p-6 max-w-sm w-full text-center">
+    <p class="text-xs text-cyan-300 font-bold tracking-widest">DEMANDE DE REVANCHE</p>
+    <div class="text-5xl mt-3">🔄</div>
+    <h2 class="text-2xl font-black mt-3"><span id="rematchChallengerName" class="text-cyan-300">Joueur</span> veut relancer !</h2>
+    <p class="text-xs text-slate-400 mt-2">Nouveau duel de 2 minutes</p>
+    <div class="mt-4">
+      <div class="meter"><span id="rematchTimerBar" style="width:100%;background:linear-gradient(90deg,#25e6ff,#ff3ab7);transition:width 1s linear"></span></div>
+      <p class="text-xs text-slate-400 mt-2">Expire dans <b id="rematchTimerText" class="text-gold-300">20</b>s</p>
+    </div>
+    <div class="flex gap-2 mt-5">
+      <button id="rematchAcceptBtn" class="flex-1 bg-gradient-to-r from-cyan-300 to-blue-500 text-slate-950 font-black rounded-xl px-4 py-3">ACCEPTER</button>
+      <button id="rematchDeclineBtn" class="flex-1 bg-pink-500/20 border border-pink-300/40 rounded-xl px-4 py-3 font-bold">REFUSER</button>
+    </div>
+  </div>
+</div>
 
 <section id="rogue" class="view">
 <div id="rogueIntro" class="glass rounded-3xl p-7">
@@ -320,6 +438,7 @@ header nav.desktop button{white-space:nowrap;flex-shrink:0}
 <nav class="mobilenav glass">
 <button data-nav="home" onclick="showView('home')">🏠<span class="block">ACCUEIL</span></button>
 <button data-nav="duel" onclick="startDuel()">⚔<span class="block">DUEL</span></button>
+<button data-nav="online" onclick="startOnline()">🌐<span class="block">EN LIGNE</span></button>
 <button data-nav="rogue" onclick="startRogue()">🔥<span class="block">ARÈNE</span></button>
 <button data-nav="royale" onclick="startRoyale()">👑<span class="block">ROYALE</span></button>
 <button data-nav="boss" onclick="startBoss()">👹<span class="block">BOSS</span></button>
@@ -486,7 +605,12 @@ function resetPasswordFlow(){
   }).catch(function(){ setAuthMsg("Impossible d'envoyer l'email."); });
 }
 function logout(){
-  if(confirm("Se déconnecter ?")) auth.signOut();
+  if(confirm("Se déconnecter ?")){
+    if(onlineState.inQueue && currentUser){
+      db.collection("matchmaking").doc(currentUser.uid).delete().catch(function(){});
+    }
+    auth.signOut();
+  }
 }
 function deleteAccount(){
   if(!currentUser) return;
@@ -640,6 +764,936 @@ function finishDuel(){
   $("resultTitle").textContent=draw?"ÉGALITÉ":win?"ADVERSAIRE À TERRE":"L'OMBRE A GAGNÉ";
   $("resultCopy").textContent="Score : "+duel.php+" vs "+duel.ehp+" · cote "+state.rating;
 }
+
+/* ============ DUEL EN LIGNE ============ */
+var onlineState = {
+  inQueue: false,
+  queueUnsub: null,
+  playersList: [],
+  myRequests: [],
+  incomingRequests: [],
+  roomId: null,
+  roomUnsub: null,
+  questions: null,
+  myIndex: 0,
+  answered: false,
+  myAnsweredForCurrent: false,
+  timer: null,
+  elapsed: 0,
+  lastTick: 99,
+  myHp: 100,
+  enemyHp: 100,
+  combo: 0,
+  finished: false,
+  searchFilter: "",
+  matchTimer: null,
+  matchEndsAt: null,
+  lastEnemy: null
+};
+
+function startOnline(){
+  showView("online");
+  $("onlineLobby").classList.remove("hidden");
+  $("onlineFight").classList.add("hidden");
+  $("onlineResult").classList.add("hidden");
+  listenQueue();
+  listenMyIncomingRequests();
+  updateQueueButtons();
+}
+
+function updateQueueButtons(){
+  if(onlineState.inQueue){
+    $("onlineJoinBtn").classList.add("hidden");
+    $("onlineLeaveBtn").classList.remove("hidden");
+    $("myQueueStatus").classList.remove("hidden");
+  } else {
+    $("onlineJoinBtn").classList.remove("hidden");
+    $("onlineLeaveBtn").classList.add("hidden");
+    $("myQueueStatus").classList.add("hidden");
+  }
+}
+
+function joinQueue(){
+  if(!currentUser || onlineState.inQueue) return;
+  onlineState.inQueue = true;
+  db.collection("matchmaking").doc(currentUser.uid).set({
+    uid: currentUser.uid,
+    pseudo: state.pseudo || "Joueur",
+    rating: state.rating || 1200,
+    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    updateQueueButtons();
+    toast("📡 Tu es maintenant visible par les autres joueurs");
+  }).catch(function(e){
+    console.warn(e);
+    onlineState.inQueue = false;
+    toast("Erreur : impossible d'entrer dans la file");
+  });
+}
+
+function leaveQueue(){
+  if(!currentUser || !onlineState.inQueue) return;
+  db.collection("matchmaking").doc(currentUser.uid).delete().then(function(){
+    onlineState.inQueue = false;
+    updateQueueButtons();
+    toast("🚪 Tu as quitté la file");
+  }).catch(function(e){ console.warn(e); });
+}
+
+function listenQueue(){
+  if(onlineState.queueUnsub) onlineState.queueUnsub();
+  onlineState.queueUnsub = db.collection("matchmaking")
+    .orderBy("joinedAt","asc")
+    .limit(50)
+    .onSnapshot(function(snap){
+      var list = [];
+      snap.forEach(function(d){
+        var data = d.data();
+        if(d.id !== currentUser.uid){
+          list.push({uid:d.id, pseudo:data.pseudo||"Joueur", rating:data.rating||1200, joinedAt:data.joinedAt});
+        } else {
+          onlineState.inQueue = true;
+          updateQueueButtons();
+        }
+      });
+      onlineState.playersList = list;
+      renderPlayersList();
+      $("onlineCount").textContent = snap.size;
+      $("onlineListCount").textContent = list.length + (list.length>1?" joueurs":" joueur");
+    }, function(e){ console.warn("Queue error", e); });
+}
+
+function renderPlayersList(){
+  var el = $("onlinePlayersList");
+  if(!el) return;
+  var filter = (onlineState.searchFilter || "").toLowerCase().trim();
+  var list = onlineState.playersList.filter(function(p){
+    return !filter || p.pseudo.toLowerCase().indexOf(filter) !== -1;
+  });
+  if(!list.length){
+    el.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">' + (filter ? "Aucun joueur ne correspond à « "+filter+" »" : "Aucun joueur pour l'instant. Sois le premier à entrer dans la file !") + '</p>';
+    return;
+  }
+  var html = "";
+  for(var i=0;i<list.length;i++){
+    var p = list[i];
+    var initial = (p.pseudo||"J")[0].toUpperCase();
+    var alreadyChallenged = onlineState.myRequests.some(function(r){ return r.to === p.uid; });
+    html += '<div class="player-row">' +
+      '<div class="avatar-sm">'+initial+'</div>' +
+      '<div class="info"><b>'+escapeHtml(p.pseudo)+'</b><small>Cote '+p.rating+'</small></div>' +
+      '<button class="btn-defier" onclick="challengePlayer(\''+p.uid+'\',\''+escapeJs(p.pseudo)+'\','+p.rating+')" '+(alreadyChallenged?'disabled':'')+'>'+(alreadyChallenged?'ENVOYÉ':'DÉFIER')+'</button>' +
+      '</div>';
+  }
+  el.innerHTML = html;
+}
+
+if($("onlineSearchInput")){
+  $("onlineSearchInput").addEventListener("input", function(e){
+    onlineState.searchFilter = e.target.value;
+    renderPlayersList();
+  });
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function escapeJs(s){ return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
+
+function challengePlayer(uid, pseudo, rating){
+  if(!currentUser) return;
+  if(onlineState.myRequests.some(function(r){ return r.to === uid; })) return;
+
+  var reqId = currentUser.uid + "_to_" + uid + "_" + Date.now();
+  var expireAt = Date.now() + 20000;
+
+  db.collection("duel_requests").doc(reqId).set({
+    from: currentUser.uid,
+    fromPseudo: state.pseudo || "Joueur",
+    fromRating: state.rating || 1200,
+    to: uid,
+    toPseudo: pseudo,
+    status: "pending",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    expireAt: expireAt
+  }).then(function(){
+    onlineState.myRequests.push({reqId:reqId, to:uid, pseudo:pseudo});
+    renderPlayersList();
+
+    setTimeout(function(){
+      db.collection("duel_requests").doc(reqId).get().then(function(s){
+        if(s.exists && s.data().status === "pending"){
+          db.collection("duel_requests").doc(reqId).update({status:"expired"});
+        }
+      });
+      onlineState.myRequests = onlineState.myRequests.filter(function(r){ return r.reqId !== reqId; });
+      renderPlayersList();
+    }, 21000);
+
+    var unsub = db.collection("duel_requests").doc(reqId).onSnapshot(function(snap){
+      if(!snap.exists) return;
+      var data = snap.data();
+      if(data.status === "accepted"){
+        unsub();
+        createOnlineRoom({uid:uid, pseudo:pseudo, rating:rating, reqId:reqId});
+      } else if(data.status === "declined" || data.status === "expired"){
+        unsub();
+        onlineState.myRequests = onlineState.myRequests.filter(function(r){ return r.reqId !== reqId; });
+        renderPlayersList();
+        toast("😕 " + pseudo + " a refusé le défi");
+      }
+    });
+  }).catch(function(e){ console.warn("Challenge error", e); toast("Erreur lors de l'envoi du défi"); });
+}
+
+function listenMyIncomingRequests(){
+  if(window._incUnsub) window._incUnsub();
+  window._incUnsub = db.collection("duel_requests")
+    .where("to","==",currentUser.uid)
+    .where("status","==","pending")
+    .onSnapshot(function(snap){
+      snap.forEach(function(d){
+        var data = d.data();
+        var reqId = d.id;
+        if(onlineState.incomingRequests.some(function(r){ return r.reqId === reqId; })) return;
+        if(data.expireAt && data.expireAt < Date.now()){
+          db.collection("duel_requests").doc(reqId).update({status:"expired"});
+          return;
+        }
+        if(onlineState.incomingRequests.length >= 4) return;
+        onlineState.incomingRequests.push({
+          reqId: reqId,
+          from: data.from,
+          pseudo: data.fromPseudo || "Joueur",
+          rating: data.fromRating || 1200,
+          expireAt: data.expireAt || (Date.now()+20000)
+        });
+      });
+      var activeIds = {};
+      snap.forEach(function(d){ activeIds[d.id] = true; });
+      onlineState.incomingRequests = onlineState.incomingRequests.filter(function(r){
+        return activeIds[r.reqId];
+      });
+      showNextPopup();
+      updateNavBadge();
+    }, function(e){ console.warn("Incoming error", e); });
+}
+
+function updateNavBadge(){
+  var count = onlineState.incomingRequests.length;
+  var btns = document.querySelectorAll('[data-nav="online"]');
+  btns.forEach(function(b){
+    b.setAttribute("data-badge", count);
+    b.classList.toggle("nav-badge", true);
+  });
+}
+
+var _popupCurrentReq = null;
+var _popupInterval = null;
+var _rematchCurrent = null;
+var _rematchInterval = null;
+
+function showNextPopup(){
+  if(_popupCurrentReq) return;
+  if(!onlineState.incomingRequests.length){
+    $("duelPopup").style.display = "none";
+    return;
+  }
+  var req = onlineState.incomingRequests[0];
+  _popupCurrentReq = req;
+
+  $("popupChallengerName").textContent = req.pseudo;
+  $("popupChallengerRating").textContent = req.rating;
+  $("duelPopup").style.display = "grid";
+
+  $("popupAcceptBtn").onclick = function(){ acceptChallenge(req); };
+  $("popupDeclineBtn").onclick = function(){ declineChallenge(req); };
+
+  var remaining = Math.max(0, Math.floor((req.expireAt - Date.now())/1000));
+  $("popupTimerText").textContent = remaining;
+  $("popupTimerBar").style.width = "100%";
+
+  clearInterval(_popupInterval);
+  _popupInterval = setInterval(function(){
+    remaining--;
+    if(remaining < 0) remaining = 0;
+    $("popupTimerText").textContent = remaining;
+    var pct = (remaining / 20) * 100;
+    $("popupTimerBar").style.width = pct + "%";
+    if(remaining <= 0){
+      clearInterval(_popupInterval);
+      db.collection("duel_requests").doc(req.reqId).update({status:"expired"}).catch(function(){});
+      dismissPopup(req);
+    }
+  }, 1000);
+}
+
+function dismissPopup(req){
+  clearInterval(_popupInterval);
+  _popupCurrentReq = null;
+  onlineState.incomingRequests = onlineState.incomingRequests.filter(function(r){ return r.reqId !== req.reqId; });
+  $("duelPopup").style.display = "none";
+  updateNavBadge();
+  setTimeout(showNextPopup, 300);
+}
+
+function acceptChallenge(req){
+  clearInterval(_popupInterval);
+  db.collection("duel_requests").doc(req.reqId).update({status:"accepted"}).then(function(){
+    _popupCurrentReq = null;
+    $("duelPopup").style.display = "none";
+    onlineState.incomingRequests = [];
+    updateNavBadge();
+    if(onlineState.inQueue){
+      db.collection("matchmaking").doc(currentUser.uid).delete().catch(function(){});
+      onlineState.inQueue = false;
+    }
+    waitForRoom(req);
+  }).catch(function(e){
+    console.warn("Accept error", e);
+    toast("Erreur lors de l'acceptation");
+    dismissPopup(req);
+  });
+}
+
+function declineChallenge(req){
+  db.collection("duel_requests").doc(req.reqId).update({status:"declined"}).catch(function(){});
+  dismissPopup(req);
+  toast("Défi refusé");
+}
+
+var _waitingTimeout = null;
+
+function waitForRoom(req){
+  $("onlineLobby").classList.add("hidden");
+  $("onlineFight").classList.remove("hidden");
+  $("onlineResult").classList.add("hidden");
+  $("onlineQ").textContent = "Connexion à la room…";
+  $("onlineA").innerHTML = "";
+  $("onlineEmoji").textContent = "⏳";
+
+  if(onlineState.roomUnsub){ onlineState.roomUnsub(); onlineState.roomUnsub = null; }
+  if(_waitingTimeout){ clearTimeout(_waitingTimeout); _waitingTimeout = null; }
+
+  var attached = false;
+  var reqRef = db.collection("duel_requests").doc(req.reqId);
+  var waitUnsub = null;
+
+  function attachRoom(roomId){
+    if(attached) return;
+    attached = true;
+    onlineState.roomId = roomId;
+    if(_waitingTimeout){ clearTimeout(_waitingTimeout); _waitingTimeout = null; }
+    if(waitUnsub){ try{ waitUnsub(); }catch(e){} waitUnsub = null; }
+    setTimeout(function(){
+      if(onlineState.roomUnsub){ try{ onlineState.roomUnsub(); }catch(e){} onlineState.roomUnsub = null; }
+      onlineState.roomUnsub = db.collection("rooms").doc(roomId).onSnapshot(function(s){
+        if(s.exists){
+          var data = s.data();
+          data.roomId = roomId;
+          onlineHandleRoomUpdate(data);
+        }
+      }, function(err){
+        console.warn("Room listen error", err);
+      });
+    }, 50);
+  }
+
+  waitUnsub = reqRef.onSnapshot(function(snap){
+    if(attached) return;
+    if(!snap.exists) return;
+    var data = snap.data();
+    if(data.roomId && data.status === "accepted"){
+      attachRoom(data.roomId);
+    }
+  }, function(err){
+    console.warn("waitForRoom listen error", err);
+  });
+
+  _waitingTimeout = setTimeout(function(){
+    if(!attached){
+      if(_waitingTimeout){ clearTimeout(_waitingTimeout); _waitingTimeout = null; }
+      if(waitUnsub){ try{ waitUnsub(); }catch(e){} waitUnsub = null; }
+      if(onlineState.roomUnsub){ onlineState.roomUnsub(); onlineState.roomUnsub = null; }
+      toast("⏱️ L'adversaire n'a pas répondu à temps");
+      backToLobby();
+    }
+  }, 20000);
+}
+
+function createOnlineRoom(enemy){
+  var pool = QUESTIONS.slice();
+  pool.sort(function(){ return Math.random() - .5; });
+  var picked = [];
+  var poolSize = pool.length;
+  for(var i = 0; i < 200; i++){
+    picked.push(prepareQuestion(pool[i % poolSize]));
+  }
+  var roomId = currentUser.uid + "_vs_" + enemy.uid + "_" + Date.now();
+  var matchDurationMs = 120000;
+  var matchEndsAt = Date.now() + matchDurationMs;
+
+  db.collection("rooms").doc(roomId).set({
+    player1: currentUser.uid,
+    player2: enemy.uid,
+    pseudo1: state.pseudo || "Joueur",
+    pseudo2: enemy.pseudo || "Adversaire",
+    hp1: 100, hp2: 100,
+    questions: picked,
+    questionIndex: 0,
+    answersP1: null,
+    answersP2: null,
+    questionStartedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    matchEndsAt: matchEndsAt,
+    rematchRequest: null,
+    status: "playing",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    if(onlineState.inQueue){
+      db.collection("matchmaking").doc(currentUser.uid).delete().catch(function(){});
+      onlineState.inQueue = false;
+    }
+    onlineState.lastEnemy = enemy;
+
+    if(enemy.reqId){
+      db.collection("duel_requests").doc(enemy.reqId).update({roomId: roomId}).catch(function(){});
+    }
+    onlineState.myRequests = onlineState.myRequests.filter(function(r){ return r.to !== enemy.uid; });
+    renderPlayersList();
+
+    $("onlineLobby").classList.add("hidden");
+    $("onlineFight").classList.remove("hidden");
+    $("onlineResult").classList.add("hidden");
+
+    onlineState.roomId = roomId;
+    onlineState.questions = null;
+    onlineState.myIndex = 0;
+    onlineState.myHp = 100;
+    onlineState.enemyHp = 100;
+    onlineState.combo = 0;
+    onlineState.answered = false;
+    onlineState.myAnsweredForCurrent = false;
+    onlineState.finished = false;
+    onlineState.matchEndsAt = matchEndsAt;
+
+    if(onlineState.roomUnsub) onlineState.roomUnsub();
+    onlineState.roomUnsub = db.collection("rooms").doc(roomId).onSnapshot(function(s){
+      if(s.exists){
+        var data = s.data();
+        data.roomId = roomId;
+        onlineHandleRoomUpdate(data);
+      }
+    }, function(err){
+      console.warn("Room listen error", err);
+    });
+
+    startMatchTimer(matchEndsAt, roomId);
+  }).catch(function(e){ console.warn("Room create error", e); toast("Erreur création de room"); });
+}
+
+function startMatchTimer(endsAt, roomId){
+  if(onlineState.matchTimer) clearInterval(onlineState.matchTimer);
+  onlineState.matchTimer = setInterval(function(){
+    var left = Math.max(0, Math.floor((endsAt - Date.now())/1000));
+    var min = Math.floor(left / 60);
+    var sec = left % 60;
+    var el = $("onlineMatchTimer");
+    if(el) el.textContent = min + ":" + (sec < 10 ? "0" : "") + sec;
+    if(left <= 0){
+      clearInterval(onlineState.matchTimer);
+      finishMatchByTime(roomId);
+    }
+  }, 250);
+}
+
+function finishMatchByTime(roomId){
+  var roomRef = db.collection("rooms").doc(roomId);
+  roomRef.get().then(function(s){
+    if(!s.exists) return;
+    var room = s.data();
+    if(room.status !== "playing") return;
+    var winner = room.hp1 > room.hp2 ? room.player1 : (room.hp2 > room.hp1 ? room.player2 : "draw");
+    return roomRef.update({status: "finished", winner: winner});
+  }).catch(function(e){ console.warn("finishMatch error", e); });
+}
+
+function onlineHandleRoomUpdate(room){
+  if(!room || !room.status) return;
+  var isP1 = room.player1 === currentUser.uid;
+  var myAnswersField = isP1 ? "answersP1" : "answersP2";
+
+  var newMyHp = isP1 ? room.hp1 : room.hp2;
+  var newEnemyHp = isP1 ? room.hp2 : room.hp1;
+
+  if(newMyHp !== onlineState.myHp){
+    var dmgMe = onlineState.myHp - newMyHp;
+    if(dmgMe > 0){ onlineFloat("onlinePlayerFx", "-"+dmgMe, "#ff627e"); onlineShake("onlinePlayerCard"); }
+    else if(dmgMe < 0){ onlineFloat("onlinePlayerFx", "+"+(-dmgMe), "#61ffad"); }
+    onlineState.myHp = newMyHp;
+  }
+  if(newEnemyHp !== onlineState.enemyHp){
+    var dmgEnemy = onlineState.enemyHp - newEnemyHp;
+    if(dmgEnemy > 0){ onlineFloat("onlineEnemyFx", "-"+dmgEnemy, "#61ffad"); onlineShake("onlineEnemyCard"); }
+    else if(dmgEnemy < 0){ onlineFloat("onlineEnemyFx", "+"+(-dmgEnemy), "#ff627e"); }
+    onlineState.enemyHp = newEnemyHp;
+  }
+  onlineUpdateHp();
+
+    // Détecter un retour en jeu (rematch) : cacher le résultat et recharger
+  if(room.status === "playing" && (onlineState.finished || !onlineState.questions)){
+    // Reset complet de l'état local
+    onlineState.finished = false;
+    onlineState.answered = false;
+    onlineState.myAnsweredForCurrent = false;
+    onlineState.myIndex = 0;
+    onlineState.combo = 0;
+    onlineState.questions = room.questions;
+    onlineState.myHp = isP1 ? room.hp1 : room.hp2;
+    onlineState.enemyHp = isP1 ? room.hp2 : room.hp1;
+    onlineState.lastQuestionIndex = -1;
+
+    // Cacher le panneau de résultat et afficher le combat
+    $("onlineResult").classList.add("hidden");
+    $("onlineLobby").classList.add("hidden");
+    $("onlineFight").classList.remove("hidden");
+
+    $("onlineMeName").textContent = isP1 ? room.pseudo1 : room.pseudo2;
+    $("onlineEnemyName").textContent = isP1 ? room.pseudo2 : room.pseudo1;
+
+    // Relancer le timer global
+    if(onlineState.matchTimer) clearInterval(onlineState.matchTimer);
+    onlineState.matchEndsAt = room.matchEndsAt;
+    startMatchTimer(room.matchEndsAt, room.roomId);
+
+    renderOnlineQuestion(room);
+  }
+
+  if(room.status === "playing" && onlineState.questions){
+    var currentIdx = room.questionIndex || 0;
+
+    if(currentIdx !== onlineState.myIndex){
+      onlineState.myIndex = currentIdx;
+      onlineState.answered = false;
+      onlineState.combo = 0;
+      renderOnlineQuestion(room);
+    } else if(!onlineState.answered){
+      var myAnswer = room[myAnswersField];
+      if(myAnswer && !onlineState.myAnsweredForCurrent){
+        onlineState.myAnsweredForCurrent = true;
+        onlineState.answered = true;
+        var b = document.querySelectorAll("#onlineA button");
+        for(var i = 0; i < b.length; i++){
+          b[i].disabled = true;
+          if(i === myAnswer.choice && !myAnswer.correct) b[i].classList.add("wrong");
+          if(myAnswer.correct && i === myAnswer.choice) b[i].classList.add("correct");
+        }
+      }
+    }
+  }
+
+  if(room.rematchRequest && room.rematchRequest.from !== currentUser.uid){
+  showRematchPopup(room.rematchRequest, room.roomId);
+  }
+
+  if(room.status === "finished" && !onlineState.finished){
+    onlineState.finished = true;
+    clearInterval(onlineState.timer);
+    if(onlineState.matchTimer) clearInterval(onlineState.matchTimer);
+    var iWon = (room.winner === currentUser.uid);
+    var draw = (room.winner === "draw");
+    $("onlineResult").classList.remove("hidden");
+    if(draw){
+      $("onlineResultIcon").textContent = "🤝";
+      $("onlineResultKicker").textContent = "MATCH NUL";
+      $("onlineResultTitle").textContent = "ÉGALITÉ";
+    } else if(iWon){
+      $("onlineResultIcon").textContent = "🏆";
+      $("onlineResultKicker").textContent = "VICTOIRE";
+      $("onlineResultTitle").textContent = "VOUS AVEZ GAGNÉ";
+      state.wins++; state.streak++; state.rating += 25; sfxWin();
+    } else {
+      $("onlineResultIcon").textContent = "💀";
+      $("onlineResultKicker").textContent = "DÉFAITE";
+      $("onlineResultTitle").textContent = "VOUS AVEZ PERDU";
+      state.losses++; state.streak = 0; state.rating = Math.max(800, state.rating - 15); sfxLose();
+    }
+    $("onlineResultCopy").textContent = "Score final : " + onlineState.myHp + " PV contre " + onlineState.enemyHp + " PV.";
+    checkBadges(); save(); renderHome();
+        // Le bouton RELANCER n'apparaît que pour le perdant
+    var relaunchBtn = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
+    if(relaunchBtn){
+      if(iWon && !draw){
+        relaunchBtn.style.display = "none";
+      } else {
+        relaunchBtn.style.display = "";
+        relaunchBtn.disabled = false;
+        relaunchBtn.textContent = draw ? "🔄 PROPOSER UNE REVANCHE" : "🔄 DEMANDER UNE REVANCHE";
+      }
+    }
+  }
+
+}
+function renderOnlineQuestion(room){
+  clearInterval(onlineState.timer);
+  var idx = room.questionIndex || 0;
+  var q = room.questions[idx];
+  if(!q) return;
+
+  onlineState.myAnsweredForCurrent = false;
+  onlineState.answered = false;
+  onlineState.elapsed = 0;
+  onlineState.lastTick = 99;
+
+  $("onlineQuestionNum").textContent = (idx + 1);
+  $("onlineMeta").textContent = "MANCHE " + (idx + 1) + " · " + q.anime;
+  $("onlineCat").textContent = q.cat + " · " + q.diff;
+  $("onlineEmoji").textContent = q.emoji;
+  $("onlineQ").textContent = q.q;
+  $("onlineF").textContent = "";
+  $("onlineTimer").textContent = "10.0";
+
+  var h = $("onlineA");
+  h.innerHTML = "";
+  q.a.forEach(function(x, i){
+    var b = document.createElement("button");
+    b.className = "answer bg-white/5 border border-cyan-300/20 rounded-xl p-4 text-left font-bold";
+    b.textContent = (i+1) + ". " + x;
+    b.onclick = function(){ answerOnline(i, room.roomId); };
+    h.appendChild(b);
+  });
+
+  onlineUpdateHp();
+
+  var startAt = room.questionStartedAt && room.questionStartedAt.toMillis ? room.questionStartedAt.toMillis() : Date.now();
+  var timeoutTriggered = false;
+  var capturedRoomId = room.roomId;
+
+  onlineState.timer = setInterval(function(){
+    var elapsed = (Date.now() - startAt) / 1000;
+    var left = Math.max(0, 10 - elapsed);
+    var el = $("onlineTimer");
+    if(el) el.textContent = left.toFixed(1);
+    var s = Math.ceil(left);
+    if(s <= 3 && s > 0 && s !== onlineState.lastTick){ onlineState.lastTick = s; sfxTick(); }
+
+    if(left <= 0 && !timeoutTriggered){
+      timeoutTriggered = true;
+      clearInterval(onlineState.timer);
+      handleTimeout(capturedRoomId, idx);
+    }
+  }, 100);
+}
+
+function handleTimeout(roomId, expectedIdx){
+  var roomRef = db.collection("rooms").doc(roomId);
+  roomRef.get().then(function(s){
+    if(!s.exists) return;
+    var room = s.data();
+    if(room.questionIndex !== expectedIdx) return;
+    var bothAnswered = room.answersP1 && room.answersP2;
+    if(bothAnswered) return;
+
+    var updates = {};
+    var hp1 = room.hp1, hp2 = room.hp2;
+
+    if(!room.answersP1 && !room.answersP2){
+      hp1 = Math.max(0, hp1 - 5);
+      hp2 = Math.max(0, hp2 - 5);
+    } else if(!room.answersP1){
+      hp1 = Math.max(0, hp1 - 5);
+    } else if(!room.answersP2){
+      hp2 = Math.max(0, hp2 - 5);
+    }
+    updates.hp1 = hp1;
+    updates.hp2 = hp2;
+
+    var someoneDead = hp1 <= 0 || hp2 <= 0;
+    if(someoneDead){
+      updates.status = "finished";
+      if(hp1 <= 0 && hp2 <= 0) updates.winner = "draw";
+      else if(hp1 <= 0) updates.winner = room.player2;
+      else updates.winner = room.player1;
+    } else {
+      updates.questionIndex = room.questionIndex + 1;
+      updates.answersP1 = null;
+      updates.answersP2 = null;
+      updates.questionStartedAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
+    return roomRef.update(updates);
+  }).catch(function(e){ console.warn("Timeout error", e); });
+}
+
+function answerOnline(choice, roomId){
+  if(onlineState.answered) return;
+  onlineState.answered = true;
+
+  var roomRef = db.collection("rooms").doc(roomId);
+  var q = onlineState.questions[onlineState.myIndex];
+  var good = choice === q.ok;
+
+  var b = document.querySelectorAll("#onlineA button");
+  for(var i = 0; i < b.length; i++){
+    b[i].disabled = true;
+    if(i === choice && !good) b[i].classList.add("wrong");
+    if(good && i === choice) b[i].classList.add("correct");
+  }
+
+  var fb = $("onlineF");
+  if(good){ sfxGood(); fb.textContent = "✓ Bonne réponse !"; }
+  else { sfxBad(); fb.textContent = "✗ Mauvaise réponse"; }
+
+  roomRef.get().then(function(s){
+    if(!s.exists) return;
+    var room = s.data();
+    if(room.status !== "playing") return;
+    var isP1 = room.player1 === currentUser.uid;
+    var myField = isP1 ? "answersP1" : "answersP2";
+    if(room[myField]) return;
+
+    var updates = {};
+    updates[myField] = {choice: choice, correct: good};
+
+    var hp1 = room.hp1, hp2 = room.hp2;
+    if(good){
+      if(isP1) hp2 = Math.max(0, hp2 - 10);
+      else hp1 = Math.max(0, hp1 - 10);
+    } else {
+      if(isP1){ hp1 = Math.max(0, hp1 - 10); hp2 = Math.min(100, hp2 + 5); }
+      else { hp2 = Math.max(0, hp2 - 10); hp1 = Math.min(100, hp1 + 5); }
+    }
+    updates.hp1 = hp1;
+    updates.hp2 = hp2;
+
+    var bothAnswered = (updates.answersP1 || room.answersP1) && (updates.answersP2 || room.answersP2);
+    var someoneDead = hp1 <= 0 || hp2 <= 0;
+
+    if(someoneDead){
+      updates.status = "finished";
+      if(hp1 <= 0 && hp2 <= 0) updates.winner = "draw";
+      else if(hp1 <= 0) updates.winner = room.player2;
+      else updates.winner = room.player1;
+    } else if(bothAnswered){
+      updates.questionIndex = room.questionIndex + 1;
+      updates.answersP1 = null;
+      updates.answersP2 = null;
+      updates.questionStartedAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
+    return roomRef.update(updates);
+  }).catch(function(e){ console.warn("answerOnline error", e); });
+}
+
+function onlineUpdateHp(){
+  var el;
+  el = $("onlinePhp"); if(el) el.style.width = onlineState.myHp + "%";
+  el = $("onlineEhp"); if(el) el.style.width = onlineState.enemyHp + "%";
+  el = $("onlinePhpText"); if(el) el.textContent = onlineState.myHp + "/100";
+  el = $("onlineEhpText"); if(el) el.textContent = onlineState.enemyHp + "/100";
+}
+
+function onlineFloat(fxId, text, color){
+  var wrap = $(fxId);
+  if(!wrap) return;
+  var el = document.createElement("div");
+  el.className = "float-dmg";
+  el.style.left = (30 + Math.random() * 40) + "%";
+  el.style.top = "40%";
+  el.style.color = color;
+  el.textContent = text;
+  wrap.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 900);
+}
+
+function onlineShake(id){
+  var el = $(id);
+  if(!el) return;
+  el.classList.remove("shake");
+  void el.offsetWidth;
+  el.classList.add("shake");
+}
+
+function backToLobby(){
+  if(onlineState.roomUnsub){ onlineState.roomUnsub(); onlineState.roomUnsub = null; }
+  if(onlineState.matchTimer){ clearInterval(onlineState.matchTimer); onlineState.matchTimer = null; }
+  if(onlineState.timer){ clearInterval(onlineState.timer); onlineState.timer = null; }
+  onlineState.roomId = null;
+  onlineState.finished = false;
+  onlineState.questions = null;
+  onlineState.myIndex = 0;
+  onlineState.myHp = 100;
+  onlineState.enemyHp = 100;
+  onlineState.combo = 0;
+  onlineState.answered = false;
+  onlineState.myAnsweredForCurrent = false;
+  $("rematchPopup").style.display = "none";
+  startOnline();
+}
+
+function relaunchOnlineDuel(){
+  if(!onlineState.roomId){
+    toast("⚠️ Session expirée. Retour au lobby.");
+    backToLobby();
+    return;
+  }
+
+  // Cacher l'écran de résultat et afficher un écran d'attente
+  $("onlineResult").classList.add("hidden");
+  $("onlineLobby").classList.add("hidden");
+  $("onlineFight").classList.remove("hidden");
+  $("onlineQ").textContent = "En attente de la réponse de l'adversaire…";
+  $("onlineA").innerHTML = "";
+  $("onlineEmoji").textContent = "⏳";
+  $("onlineMeta").textContent = "";
+  $("onlineCat").textContent = "";
+
+  // Afficher un état d'attente au demandeur (au cas où l'écran de résultat reviendrait)
+  var relaunchBtn = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
+  if(relaunchBtn){
+    relaunchBtn.disabled = true;
+    relaunchBtn.textContent = "⏳ EN ATTENTE DE L'ADVERSAIRE…";
+  }
+  toast("📩 Demande envoyée, en attente de l'adversaire…");
+
+  db.collection("rooms").doc(onlineState.roomId).update({
+    rematchRequest: {
+      from: currentUser.uid,
+      fromPseudo: state.pseudo || "Joueur",
+      requestedAt: Date.now(),
+      expiresAt: Date.now() + 20000
+    }
+  }).then(function(){
+    // Attendre la réponse via polling toutes les 800ms
+    var waitedAt = Date.now();
+    var poll = setInterval(function(){
+      db.collection("rooms").doc(onlineState.roomId).get().then(function(s){
+        if(!s.exists){ clearInterval(poll); return; }
+        var r = s.data();
+
+        // Si la room est repassée en "playing", c'est que l'autre a accepté
+        if(r.status === "playing"){
+          clearInterval(poll);
+          // Reset local pour que onlineHandleRoomUpdate recharge le combat
+          onlineState.finished = false;
+          onlineState.questions = null;
+          onlineState.answered = false;
+          onlineState.myAnsweredForCurrent = false;
+          onlineState.lastQuestionIndex = -1;
+          var btn = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
+          if(btn){ btn.disabled = false; btn.textContent = "🔄 DEMANDER UNE REVANCHE"; }
+          return;
+        }
+
+        // Si le rematchRequest a disparu (refus ou expiration)
+        if(!r.rematchRequest){
+          clearInterval(poll);
+          var btn2 = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
+          if(btn2){ btn2.disabled = false; btn2.textContent = "🔄 DEMANDER UNE REVANCHE"; }
+          toast("😕 Revanche refusée ou expirée");
+          return;
+        }
+
+        // Timeout de secours
+        if(Date.now() - waitedAt > 22000){
+          clearInterval(poll);
+          var btn3 = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
+          if(btn3){ btn3.disabled = false; btn3.textContent = "🔄 DEMANDER UNE REVANCHE"; }
+        }
+      }).catch(function(e){ console.warn("Poll rematch error", e); });
+    }, 800);
+  }).catch(function(e){
+    console.warn("Rematch error", e);
+    toast("⚠️ Impossible d'envoyer la demande.");
+    var btn4 = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
+    if(btn4){ btn4.disabled = false; btn4.textContent = "🔄 DEMANDER UNE REVANCHE"; }
+  });
+}
+
+function showRematchPopup(rematch, roomId){
+  if(!rematch || !rematch.from) return;
+  if(_rematchCurrent) return;
+  if(rematch.from === currentUser.uid) return;
+  if(rematch.expiresAt && rematch.expiresAt < Date.now()){
+    db.collection("rooms").doc(roomId).update({rematchRequest: null}).catch(function(){});
+    return;
+  }
+  _rematchCurrent = {rematch: rematch, roomId: roomId};
+
+  $("rematchChallengerName").textContent = rematch.fromPseudo || "Joueur";
+  $("rematchPopup").style.display = "grid";
+
+  $("rematchAcceptBtn").onclick = function(){
+    if(_rematchInterval){ clearInterval(_rematchInterval); _rematchInterval = null; }
+    _rematchCurrent = null;
+    $("rematchPopup").style.display = "none";
+    resetRoomForRematch(roomId);
+  };
+  $("rematchDeclineBtn").onclick = function(){
+    if(_rematchInterval){ clearInterval(_rematchInterval); _rematchInterval = null; }
+    _rematchCurrent = null;
+    $("rematchPopup").style.display = "none";
+    db.collection("rooms").doc(roomId).update({rematchRequest: null}).catch(function(){});
+    toast("Revanche refusée");
+  };
+
+  var remaining = Math.max(0, Math.floor((rematch.expiresAt - Date.now())/1000));
+  $("rematchTimerText").textContent = remaining;
+  $("rematchTimerBar").style.width = "100%";
+
+  if(_rematchInterval) clearInterval(_rematchInterval);
+  _rematchInterval = setInterval(function(){
+    remaining--;
+    if(remaining < 0) remaining = 0;
+    $("rematchTimerText").textContent = remaining;
+    $("rematchTimerBar").style.width = ((remaining / 20) * 100) + "%";
+    if(remaining <= 0){
+      if(_rematchInterval){ clearInterval(_rematchInterval); _rematchInterval = null; }
+      db.collection("rooms").doc(roomId).update({rematchRequest: null}).catch(function(){});
+      _rematchCurrent = null;
+      $("rematchPopup").style.display = "none";
+    }
+  }, 1000);
+}
+
+function resetRoomForRematch(roomId){
+  var pool = QUESTIONS.slice();
+  pool.sort(function(){ return Math.random() - .5; });
+  var picked = [];
+  var poolSize = pool.length;
+  for(var i = 0; i < 200; i++){
+    picked.push(prepareQuestion(pool[i % poolSize]));
+  }
+  var matchDurationMs = 120000;
+  var matchEndsAt = Date.now() + matchDurationMs;
+
+  db.collection("rooms").doc(roomId).update({
+    hp1: 100, hp2: 100,
+    questions: picked,
+    questionIndex: 0,
+    answersP1: null,
+    answersP2: null,
+    questionStartedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    matchEndsAt: matchEndsAt,
+    rematchRequest: null,
+    status: "playing",
+    winner: null
+  }).then(function(){
+    onlineState.questions = null;
+    onlineState.myIndex = 0;
+    onlineState.myHp = 100;
+    onlineState.enemyHp = 100;
+    onlineState.combo = 0;
+    onlineState.answered = false;
+    onlineState.finished = false;
+    onlineState.myAnsweredForCurrent = false;
+    onlineState.matchEndsAt = matchEndsAt;
+    $("onlineResult").classList.add("hidden");
+    $("onlineFight").classList.remove("hidden");
+    $("onlineLobby").classList.add("hidden");
+    if(onlineState.matchTimer) clearInterval(onlineState.matchTimer);
+    startMatchTimer(matchEndsAt, roomId);
+        // Réafficher le bouton relancer pour les deux
+    var relaunchBtn = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
+    if(relaunchBtn) relaunchBtn.style.display = "";
+  }).catch(function(e){ console.warn("Reset room error", e); });
+}
+
 function checkBadges(){
   var b={};for(var i=0;i<state.badges.length;i++)b[state.badges[i]]=true;
   if(state.correct>=10)b["🧠 10 BONNES"]=true;
