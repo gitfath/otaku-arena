@@ -206,7 +206,10 @@ header nav.desktop button{white-space:nowrap;flex-shrink:0}
 </section>
 
 <section id="duel" class="view">
-<div class="flex justify-between items-center mb-5"><div><p class="text-xs text-cyan-300 font-bold tracking-widest">ARÈNE CLASSÉE</p><h1 class="text-3xl font-black">DUEL OTAKU</h1></div><div class="glass rounded-xl px-5 py-3 text-center"><small>TEMPS</small><strong id="timer" class="block text-2xl text-gold-300">15.0</strong></div></div>
+<div class="flex justify-between items-center mb-5"><div><p class="text-xs text-cyan-300 font-bold tracking-widest">ARÈNE CLASSÉE</p><h1 class="text-3xl font-black">DUEL OTAKU</h1></div><div class="flex gap-2 flex-wrap">
+  <div class="glass rounded-xl px-4 py-3 text-center"><small>MANCHE</small><strong id="timer" class="block text-2xl text-gold-300">10.0</strong></div>
+  <div class="glass rounded-xl px-4 py-3 text-center"><small>MATCH</small><strong id="timerGlobal" class="block text-2xl text-cyan-300">2:00</strong></div>
+</div></div>
 <div class="grid md:grid-cols-2 gap-4">
 <div class="glass rounded-2xl p-5"><div class="flex gap-4 items-center"><div class="avatar">O</div><div class="flex-1"><p class="text-xs text-cyan-300">TOI · <span id="combo">COMBO x0</span></p><h2 class="font-black">JOUEUR</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="phpText">100/100</span></div><div class="meter mt-2"><span id="php" style="width:100%;background:linear-gradient(90deg,#25e6ff,#57ffca)"></span></div></div></div></div>
 <div class="glass rounded-2xl p-5"><div class="flex gap-4 items-center"><div class="avatar" style="background:linear-gradient(135deg,#ff3ab7,#52265f)">K</div><div class="flex-1"><p class="text-xs text-pink-300">ADVERSAIRE</p><h2 id="enemyName" class="font-black">KuroNeko</h2><div class="flex justify-between text-xs mt-3"><span>PV</span><span id="ehpText">100/100</span></div><div class="meter mt-2"><span id="ehp" style="width:100%;background:linear-gradient(90deg,#ff3ab7,#ff8a65)"></span></div></div></div></div>
@@ -671,6 +674,7 @@ function addXp(n){var b=level();state.xp+=n;var a=level();if(a>b){toast("🎉 NI
 var duelTimer=null,royaleTimer=null,rogueTimer=null;
 function showView(id){
   clearInterval(duelTimer);clearInterval(royaleTimer);clearInterval(rogueTimer);
+  if(duel.globalTimer && id !== "duel"){ clearInterval(duel.globalTimer); duel.globalTimer = null; }
   var v=document.querySelectorAll(".view");
   for(var i=0;i<v.length;i++)v[i].classList.toggle("active",v[i].id===id);
   var nv=document.querySelectorAll("[data-nav]");
@@ -694,14 +698,31 @@ function renderHome(){
   $("sound").textContent=state.sound?"SON : ON":"SON : OFF";
 }
 
-var duel={qs:[],i:0,php:100,ehp:100,combo:0,answered:true,elapsed:0,lastTick:99,powers:{scan:1,risk:1,vision:1},scan:false,risk:false};
+var duel={qs:[],i:0,php:100,ehp:100,combo:0,answered:true,elapsed:0,lastTick:99,powers:{scan:1,risk:1,vision:1},scan:false,risk:false,matchEndsAt:0,globalTimer:null};
 function startDuel(){
   showView("duel");
   var pool=QUESTIONS.slice();pool.sort(function(){return Math.random()-.5});
-  var prep=[];for(var i=0;i<Math.min(5,pool.length);i++)prep.push(prepareQuestion(pool[i]));
+  var prep=[];var poolSize=pool.length;
+for(var i=0;i<200;i++){prep.push(prepareQuestion(pool[i%poolSize]));}
   duel={qs:prep,i:0,php:100,ehp:100,combo:0,answered:true,elapsed:0,lastTick:99,powers:{scan:1,risk:1,vision:1},scan:false,risk:false};
   $("duelResult").classList.add("hidden");
   $("enemyName").textContent=pick(enemyNames);
+$("duelResult").classList.add("hidden");
+// Timer global de 2 minutes
+duel.matchEndsAt = Date.now() + 120000;
+clearInterval(duel.globalTimer);
+duel.globalTimer = setInterval(function(){
+  var left = Math.max(0, Math.floor((duel.matchEndsAt - Date.now())/1000));
+  var min = Math.floor(left / 60);
+  var sec = left % 60;
+  var el = $("timerGlobal");
+  if(el) el.textContent = min + ":" + (sec < 10 ? "0" : "") + sec;
+  if(left <= 0){
+    clearInterval(duel.globalTimer);
+    finishDuel();
+  }
+}, 250);
+renderDuel();
   renderDuel();
 }
 function renderDuel(){
@@ -711,11 +732,11 @@ function renderDuel(){
   $("qMeta").textContent="MANCHE "+(duel.i+1)+"/"+duel.qs.length+" · "+q.anime;
   $("qDiff").textContent=q.diff;$("qCat").textContent=q.cat;$("qText").textContent=q.q;$("qEmoji").textContent=q.emoji;
   $("hint").classList.add("hidden");$("hint").textContent=q.h;
-  $("feedback").textContent="";$("timer").textContent="15.0";
+  $("feedback").textContent="";$("timer").textContent="10.0";
   var h=$("answers");h.innerHTML="";
   q.a.forEach(function(x,i){var b=document.createElement("button");b.className="answer bg-white/5 border border-cyan-300/20 rounded-xl p-4 text-left font-bold";b.textContent=(i+1)+". "+x;b.onclick=function(){answerDuel(i)};h.appendChild(b)});
   updateDuel();renderPowers();
-  duelTimer=setInterval(function(){duel.elapsed+=.1;var left=Math.max(0,15-duel.elapsed);$("timer").textContent=left.toFixed(1);var s=Math.ceil(left);if(s<=5&&s>0&&s!==duel.lastTick){duel.lastTick=s;sfxTick()}if(duel.elapsed>=15)answerDuel(-1)},100);
+  duelTimer=setInterval(function(){duel.elapsed+=.1;var left=Math.max(0,10-duel.elapsed);var el=$("timer");if(el)el.textContent=left.toFixed(1);var s=Math.ceil(left);if(s<=3&&s>0&&s!==duel.lastTick){duel.lastTick=s;sfxTick()}if(duel.elapsed>=10)answerDuel(-1)},100);
 }
 function renderPowers(){
   var keys=["scan","risk","vision"];
@@ -754,6 +775,7 @@ function answerDuel(choice){
 function updateDuel(){$("php").style.width=duel.php+"%";$("ehp").style.width=duel.ehp+"%";$("phpText").textContent=duel.php+"/100";$("ehpText").textContent=duel.ehp+"/100";$("combo").textContent="COMBO x"+duel.combo}
 function finishDuel(){
   clearInterval(duelTimer);
+  if(duel.globalTimer) clearInterval(duel.globalTimer);
   var draw=duel.php===duel.ehp,win=!draw&&(duel.ehp<=0||duel.php>duel.ehp);
   if(draw){state.rating+=2;state.streak=0}
   else if(win){state.wins++;state.streak++;if(state.streak>state.bestStreak)state.bestStreak=state.streak;state.rating+=18;sfxWin();toast("🏆 Victoire !")}
