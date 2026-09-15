@@ -1583,6 +1583,9 @@ function relaunchOnlineDuel(){
         // Si le rematchRequest a disparu (refus ou expiration)
         if(!r.rematchRequest){
           clearInterval(poll);
+          // Réafficher le panneau de résultat
+          $("onlineResult").classList.remove("hidden");
+          $("onlineFight").classList.add("hidden");
           var btn2 = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
           if(btn2){ btn2.disabled = false; btn2.textContent = "🔄 DEMANDER UNE REVANCHE"; }
           toast("😕 Revanche refusée ou expirée");
@@ -1592,14 +1595,19 @@ function relaunchOnlineDuel(){
         // Timeout de secours
         if(Date.now() - waitedAt > 22000){
           clearInterval(poll);
+          $("onlineResult").classList.remove("hidden");
+          $("onlineFight").classList.add("hidden");
           var btn3 = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
           if(btn3){ btn3.disabled = false; btn3.textContent = "🔄 DEMANDER UNE REVANCHE"; }
+          toast("⏱️ Pas de réponse, réessaie");
         }
       }).catch(function(e){ console.warn("Poll rematch error", e); });
     }, 800);
   }).catch(function(e){
     console.warn("Rematch error", e);
     toast("⚠️ Impossible d'envoyer la demande.");
+    $("onlineResult").classList.remove("hidden");
+    $("onlineFight").classList.add("hidden");
     var btn4 = document.querySelector("#onlineResult button[onclick='relaunchOnlineDuel()']");
     if(btn4){ btn4.disabled = false; btn4.textContent = "🔄 DEMANDER UNE REVANCHE"; }
   });
